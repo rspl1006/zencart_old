@@ -169,30 +169,6 @@
 <br class="clearBoth" />
 </fieldset>
 
-<?php
-// Additional customers fields.
-if ($customersFields->countFields() > 0) {
-	
-    if ($customersFields->isActive('test_field') && $customersFields->isRequired('test_field')) {
-        ?>
-        <legend><?php echo TABLE_HEADING_LOGIN_DETAILS; ?></legend>
-        <label class="inputLabel" for="test_field"><?php echo ENTRY_EMAIL_ADDRESS; ?></label>
-        <?php echo zen_draw_input_field('test_field', '', zen_set_field_length(TABLE_CUSTOMERS, 'test_field', '40') . ' id="test_field"') . '<span class="alert">' . ENTRY_EMAIL_ADDRESS_TEXT . '</span>'; ?>
-        <br class="clearBoth" />
-        <?php
-    
-    } elseif ($customersFields->isActive('test_field') && !$customersFields->isRequired('test_field')) {
-        ?>
-        <legend><?php echo TABLE_HEADING_LOGIN_DETAILS; ?></legend>
-        <label class="inputLabel" for="test_field"><?php echo ENTRY_EMAIL_ADDRESS; ?></label>
-        <?php echo zen_draw_input_field('test_field', '', zen_set_field_length(TABLE_CUSTOMERS, 'test_field', '40') . ' id="test_field"'); ?>
-        <br class="clearBoth" />
-        <?php
-    }   
-}
-// End of additional customers fields.
-?>
-
 <fieldset>
 <legend><?php echo ENTRY_EMAIL_PREFERENCE; ?></legend>
 <?php

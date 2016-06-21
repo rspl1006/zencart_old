@@ -42,20 +42,6 @@
     $orders_status_array[$orders_status->fields['orders_status_id']] = $orders_status->fields['orders_status_name'];
     $orders_status->MoveNext();
   }
-  
-  // Payment invoice notes
-$payment_module_code =  $order->info['payment_module_code']; 
-$filepath = DIR_FS_CATALOG . DIR_WS_MODULES . '/payment/' . $payment_module_code . '.php';
-if (file_exists($filepath)) {
-	require($filepath);
-
-	$current_paymethod = new $payment_module_code;
-	if(is_object($current_paymethod) && method_exists($current_paymethod,'get_invoice_note')){
-		$note = $current_paymethod->get_invoice_note();
-	} else {
-		$note = array('title' => '');
-	}
-}
 ?>
 <!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html <?php echo HTML_PARAMS; ?>>
@@ -89,7 +75,7 @@ function couponpopupWindow(url) {
       </tr>
 
 <?php
-      $order_check = $db->Execute("select cc_cvv, customers_id, customers_name, customers_company, customers_street_address,
+      $order_check = $db->Execute("select cc_cvv, customers_name, customers_company, customers_street_address,
                                     customers_suburb, customers_city, customers_postcode,
                                     customers_state, customers_country, customers_telephone,
                                     customers_email_address, customers_address_format_id, delivery_name,
@@ -102,11 +88,6 @@ function couponpopupWindow(url) {
                                     currency_value, date_purchased, orders_status, last_modified
                              from " . TABLE_ORDERS . "
                              where orders_id = '" . (int)$oID . "'");
-							 
-	  $order_xinfo = $db->Execute("select dealercode, wagsn, customers_group_pricing
-							from " . TABLE_CUSTOMERS . "
-							where customers_id = '" . (int)$order_check->fields['customers_id'] . "'");
-							 
   $show_customer = 'false';
   if ($order_check->fields['billing_name'] != $order_check->fields['delivery_name']) {
     $show_customer = 'true';
@@ -159,29 +140,14 @@ function couponpopupWindow(url) {
     <td class="main"><b><?php echo ENTRY_ORDER_ID . $oID; ?></b></td>
   </tr>
   <tr>
-    <td class="main">&nbsp;</td>
-  </tr>
-  <tr>
     <td><table border="0" cellspacing="0" cellpadding="2">
-		<tr>
-			<td class="main" align="right" valign="top" style="width:200px"><strong><?php echo ENTRY_DATE_PURCHASED; ?></strong></td>
-			<td class="main"><?php echo zen_date_long($order->info['date_purchased']); ?></td>
-		</tr>
-		<tr>
-			<td class="main" align="right" valign="top" style="width:200px"><b><?php echo ENTRY_PAYMENT_METHOD; ?></b></td>
-			<td class="main"><?php echo $order->info['payment_method']; ?></td>
-		</tr>
-		<tr><td class="main" align="right" valign="top" style="width:200px"><strong>Order Notes:</strong></td><td><?php echo $note['title']; ?></td></tr>
-		<tr>
-			<td class="main" align="right" valign="top" style="width:200px"><b>Card Owner's Name:</b></td>
-			<td class="main"><?php echo $order->info['cc_owner']; ?></td></tr>
-		<tr>
-			<td class="main" align="right" valign="top" style="width:200px"><b>Credit Card Expiration Date:</b></td>
-			<td class="main"><?php echo $order->info['cc_expires']; ?></td></tr>
-		<tr>
-			<td class="main" align="right" valign="top" style="width:200px"><b>WAG SN:</b></td>
-			<td class="main"><?php echo $order_xinfo->fields['wagsn']; ?></td>
-		</tr>
+      <tr>
+        <td class="main"><strong><?php echo ENTRY_DATE_PURCHASED; ?></strong></td>
+        <td class="main"><?php echo zen_date_long($order->info['date_purchased']); ?></td>
+      </tr>
+      <tr>
+        <td class="main"><b><?php echo ENTRY_PAYMENT_METHOD; ?></b></td>
+        <td class="main"><?php echo $order->info['payment_method']; ?></td>
       </tr>
     </table></td>
   </tr>

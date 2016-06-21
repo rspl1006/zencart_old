@@ -47,7 +47,6 @@ if (PRODUCT_LIST_CATEGORIES_IMAGE_STATUS == 'true') {
   echo zen_draw_hidden_field('main_page', FILENAME_DEFAULT);
   echo zen_hide_session_id();
 ?>
-
 <?php
   // draw cPath if known
   if (!$getoption_set) {

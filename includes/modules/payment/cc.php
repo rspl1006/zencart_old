@@ -239,13 +239,6 @@ class cc extends base {
 
     return $process_button_string;
   }
-  
-   //Ecrypts data with given salt for secure proccessing
-  function encrypt($cypo)
-		{
-		$SALT = '037485627384567843625';
-        return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $SALT, $cypo, MCRYPT_MODE_ECB, mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND))));
-		}
   /**
    * Store the CC info to the order
    *
@@ -256,10 +249,9 @@ class cc extends base {
     $order->info['cc_type'] = $_POST['cc_type'];
     $order->info['cc_owner'] = $_POST['cc_owner'];
     $order->info['cc_cvv'] = $_POST['cc_cvv'];
+
     $len = strlen($_POST['cc_number']);
-	$SALT = '037485627384567843625';
-    $this->cc_middle = trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $SALT, $_POST['cc_number'], MCRYPT_MODE_ECB, mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND))));
-	//$this->cc_middle = encrypt($this->cc_middle);
+    $this->cc_middle = substr($_POST['cc_number'], 4, ($len-8));
     if ( (defined('MODULE_PAYMENT_CC_EMAIL')) && (zen_validate_email(MODULE_PAYMENT_CC_EMAIL)) ) {
       $order->info['cc_number'] = substr($_POST['cc_number'], 0, 4) . str_repeat('X', (strlen($_POST['cc_number']) - 8)) . substr($_POST['cc_number'], -4);
     }

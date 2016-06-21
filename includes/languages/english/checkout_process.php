@@ -31,13 +31,12 @@ define('EMAIL_TEXT_INVOICE_URL_CLICK', 'Click here for a Detailed Invoice');
 define('EMAIL_TEXT_DATE_ORDERED', 'Date Ordered:');
 define('EMAIL_TEXT_PRODUCTS', 'Products');
 define('EMAIL_TEXT_SUBTOTAL', 'Sub-Total:');
-define('EMAIL_TEXT_TAX', 'Estimated Duties & Taxes:        ');
+define('EMAIL_TEXT_TAX', 'Tax:        ');
 define('EMAIL_TEXT_SHIPPING', 'Shipping: ');
 define('EMAIL_TEXT_TOTAL', 'Total:    ');
 define('EMAIL_TEXT_DELIVERY_ADDRESS', 'Delivery Address');
 define('EMAIL_TEXT_BILLING_ADDRESS', 'Billing Address');
 define('EMAIL_TEXT_PAYMENT_METHOD', 'Payment Method');
-define('EMAIL_TEXT_SHIPPING_DDU', 'DDU - (Delivered Duty Unpaid) ALL INTERNATIONAL CUSTOMERS ARE RESPONSIBLE FOR PAYING DUTIES AND TAXES WHEN THE SHIPMENT ARRIVES IN COUNTRY.');
 
 define('EMAIL_SEPARATOR', '------------------------------------------------------');
 define('TEXT_EMAIL_VIA', 'via');

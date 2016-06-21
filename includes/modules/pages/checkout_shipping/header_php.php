@@ -85,11 +85,6 @@
   }
 
   $total_weight = $_SESSION['cart']->show_weight();
-  $total_domestic_weight = $_SESSION['cart']->show_ups_domestic_weight();
-  $total_international_weight = $_SESSION['cart']->show_ups_international_weight();
-  $ups_packages = $_SESSION['cart']->get_packages();
-
-   
   $total_count = $_SESSION['cart']->count_contents();
 
 // load all enabled shipping modules

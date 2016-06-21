@@ -8,52 +8,45 @@
  */
 /**
  * UPS Shipping Module class
- * 
+ *
  */
 class ups extends base {
-  
   /**
    * Declare shipping module alias code
    *
    * @var string
    */
   var $code;
-  
   /**
    * Shipping module display name
    *
    * @var string
    */
   var $title;
-  
   /**
    * Shipping module display description
    *
    * @var string
    */
   var $description;
-  
   /**
    * Shipping module icon filename/path
    *
    * @var string
    */
   var $icon;
-  
   /**
    * Shipping module status
    *
    * @var boolean
    */
   var $enabled;
-  
   /**
    * Shipping module list of supported countries (unique to USPS/UPS)
    *
    * @var array
    */
   var $types;
-  
   /**
    * Constructor
    *
@@ -109,216 +102,14 @@ class ups extends base {
                          'GND' => 'Ground',
                          'GNDCOM' => 'Ground Commercial',
                          'GNDRES' => 'Ground Residential',
-                         'STD' => 'Standard',
+                         'STD' => 'Canada Standard',
                          'XPR' => 'Worldwide Express',
                          'XPRL' => 'worldwide Express Letter',
                          'XDM' => 'Worldwide Express Plus',
                          'XDML' => 'Worldwide Express Plus Letter',
                          'XPD' => 'Worldwide Expedited',
                          'WXS' => 'Worldwide Saver');
-						 
-
-    $this->service_types = array('1DM' => '14',
-                         '1DML' => '',
-                         '1DA' => '01',
-                         '1DAL' => '',
-                         '1DAPI' => '',
-                         '1DP' => '13',
-                         '1DPL' => '',
-                         '2DM' => '59',
-                         '2DML' => '',
-                         '2DA' => '02',
-                         '2DAL' => '',
-                         '3DS' => '12',
-                         'GND' =>'03',
-                         'GNDCOM' => '',
-                         'GNDRES' => '',
-                         'STD' => '11',
-                         'XPR' => '07',
-                         'XPRL' => '',
-                         'XDM' => '54',
-                         'XDML' => '',
-                         'XPD' => '08',
-                         'WXS' => '65');
-						 
   }
-
-	function get_service_code_for_method($method) {
-	   return $this->service_types[$method];
-	}
-
-	function get_method_service_code($service_code) {
-	  
-	  foreach($this->service_types as $method => $service) {
-			if($service == $service_code){
-				return $method;
-			}
-	   }
-	   return null;
-	}
-  
-  function convert_to_USD($amount,$currency_code){
-  
-		$request = curl_init('http://www.google.com/ig/calculator?hl=en&q=' .$amount . $currency_code . '=?USD');  
-		
-		curl_setopt($request, CURLOPT_HEADER, 1);  
-		curl_setopt($request, CURLOPT_POST, 1);  
-		curl_setopt($request, CURLOPT_TIMEOUT, 60);  
-		curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);  
-		curl_setopt($request, CURLOPT_SSL_VERIFYPEER, 0);  
-		curl_setopt($request, CURLOPT_SSL_VERIFYHOST, 0);  
-		
-		$response=curl_exec ($request);  
-		$json_data = strstr($response, '{lhs:'); 
-		$start = strpos($json_data,'rhs: "') + 6;
-		$end = strpos($json_data,'U.S. dollars')-1;
-		$usd = round(substr($json_data,$start,($end-$start)),2);
-		curl_close($request); 
-		return $usd;
-  }
-  /**
-   * Get quote from the new UPS XML based APIs:
-   */
-	function get_ups_rate($package_origin_zip,$package_origin_iso, $package_destination_zip, $package_destination_iso, $package_weight,$method) {  
-
-		$AccessLicenseNumber = '8C5908AC04CFD8F4'; 
-		$UserId = 'ptibbert'; 
-		$Password = 'ceaser';  
-		
-		//$package_origin_zip = '2132';
-		//$package_origin_iso = 'NL';
-		
-		//$package_origin_zip = '';
-		//$package_origin_iso = 'HK';
-		
-		if ($method == null || $method == '') {
-			$request_option = 'Shop';
-			$service = '';
-		} else {
-			$service_code = $this->get_service_code_for_method($method);
-			$request_option = 'Rate';
-			$service = "<Service><Code>$service_code</Code></Service>";
-			print $service;
-		}
-		
-		if ($package_origin_iso == 'NL' || $package_origin_iso == 'HK' ) {
-			$weight_uom = "<Code>KGS</Code>";
-			$package_weight = $package_weight * 0.45359237;
-		} else {
-			$weight_uom = "<Code>LBS</Code>";
-		}
-		
-		$data ="<?xml version=\"1.0\"?>  
-		<AccessRequest xml:lang=\"en-US\">  
-			<AccessLicenseNumber>$AccessLicenseNumber</AccessLicenseNumber>  
-			<UserId>$UserId</UserId>  
-			<Password>$Password</Password>  
-		</AccessRequest>  
-		<?xml version=\"1.0\"?>  
-		<RatingServiceSelectionRequest xml:lang=\"en-US\">  
-			<Request>  
-				<TransactionReference>  
-					<CustomerContext>Test Request</CustomerContext>  
-					<XpciVersion>1.0001</XpciVersion>  
-				</TransactionReference>  
-				<RequestAction>Rate</RequestAction>  
-				<RequestOption>$request_option</RequestOption>  
-			</Request>  
-		<PickupType>  
-			<Code>01</Code>  
-		</PickupType>  
-		<Shipment>  
-			<Shipper>  
-				<Address>  
-					<PostalCode>48462</PostalCode>  
-					<CountryCode>US</CountryCode>  
-				</Address>  
-			</Shipper>  
-			<ShipTo>  
-				<Address>  
-					<PostalCode>$package_destination_zip</PostalCode>  
-					<CountryCode>$package_destination_iso</CountryCode>  
-				<CommercialAddressIndicator/>  
-				</Address>  
-			</ShipTo>  
-			<ShipFrom>  
-				<Address>  
-					<PostalCode>$package_origin_zip</PostalCode>  
-					<CountryCode>$package_origin_iso</CountryCode>  
-				</Address>  
-			</ShipFrom>  
-			$service  
-			<Package>  
-				<PackagingType>  
-					<Code>02</Code>  
-				</PackagingType> 
-				<PackageWeight>  
-					<UnitOfMeasurement>  
-						$weight_uom  
-					</UnitOfMeasurement>  
-					<Weight>$package_weight</Weight>  
-				</PackageWeight>  
-			</Package>  
-		</Shipment>  
-		</RatingServiceSelectionRequest>";  
-		
-		$request = curl_init("https://www.ups.com/ups.app/xml/Rate");  
-		
-		curl_setopt($request, CURLOPT_HEADER, 1);  
-		curl_setopt($request, CURLOPT_POST, 1);  
-		curl_setopt($request, CURLOPT_TIMEOUT, 60);  
-		curl_setopt($request, CURLOPT_RETURNTRANSFER, 1);  
-		curl_setopt($request, CURLOPT_SSL_VERIFYPEER, 0);  
-		curl_setopt($request, CURLOPT_SSL_VERIFYHOST, 0);  
-		curl_setopt($request, CURLOPT_POSTFIELDS,$data);  
-		
-		$response=curl_exec ($request);  
-		$xml_data = strstr($response, '<?');  
-		curl_close($request); 
-
-		$result = new SimpleXMLElement($xml_data);
-		$upsQuote = array();
-
-		//print 'Data: ' .  $package_origin_zip . ' - ' . $package_origin_iso . ' - ' . $package_destination_zip . ' - ' . $package_destination_iso . ' - ' . $package_weight . ' - ' . $prod . '<br/>';
-		//print '<!-- '. $response. ' -->';
-		//print 'Result : ' . $result->Response->ResponseStatusDescription . '<br/>';
-		//print 'Error  : ' . $result->Response->Error->ErrorCode . '<br/>';
-		//print 'Error  : ' . $result->Response->Error->ErrorDescription . '<br/>';
-		//print 'XML    : <pre>' . $xml_data . '</pre><br/>';
-		
-		//An error occured so return an empty quote array;
-		if($result->Response->ResponseStatusCode != '1'){
-			return $upsQuote;
-		}
-		
-		//Build a quote array for the successfull quotes
-		foreach($result->children() as $name => $element ) {
-			if($name == 'RatedShipment' ){
-				$quoted_method = $this->get_method_service_code($element->Service->Code);
-				$currency_code = $element->TotalCharges->CurrencyCode;
-				
-				$native_amount = $element->TotalCharges->MonetaryValue;
-				if($currency_code == "USD"){
-					$amount = $native_amount;
-				} else if ($currency_code == "EUR" || $currency_code == "HKD"){
-					$amount = $this->convert_to_USD($native_amount,$currency_code);
-				} else {
-					//Could not convert currency so don't quote;
-					return $upsQuote;
-				}
-				
-				if($quoted_method != null && $quoted_method != ''){
-					$upsQuote[] = array($quoted_method => $amount);
-				}
-				//print 'Service: ' . $quoted_method . '<br/>';
-				//print 'Quote  : ' .  $native_amount . '<br/>';
-				//print 'Currency  : ' .  $currency_code . '<br/>';
-				//print 'USD    : ' .  $amount . '<br/>';
-			}
-		}
-		return $upsQuote;	
-   }  
-	
   /**
    * Get quote from shipping provider's API:
    *
@@ -326,101 +117,33 @@ class ups extends base {
    * @return array of quotation results
    */
   function quote($method = '') {
-    global $_POST, $order,  $shipping_num_boxes, $db, $shipping_packages,$shipping_domestic_weight, $shipping_international_weight;
+    global $_POST, $order, $shipping_weight, $shipping_num_boxes;
 
-  
-    $shipping_destination_country_id = $order->delivery['country']['id'];
+    if ( (zen_not_null($method)) && (isset($this->types[$method])) ) {
+      $prod = $method;
+      // BOF: UPS USPS
+    } else if ($order->delivery['country']['iso_code_2'] == 'CA') {
+      $prod = 'STD';
+      // EOF: UPS USPS
+    } else {
+      $prod = 'GNDRES';
+    }
 
-    $origin_query = "select shipping_origin_country_id, shipping_origin_zip from zen_shipping_origin where destination_country_id = " . (int)$shipping_destination_country_id . "";
-    $shipping_origin = $db->Execute($origin_query);
+    if ($method) $this->_upsAction('3'); // return a single quote
 
-    $shipping_origin_country = $shipping_origin->fields['shipping_origin_country_id'];
-    $shipping_origin_zip = $shipping_origin->fields['shipping_origin_zip'];
+    $this->_upsProduct($prod);
 
-	if($shipping_origin_country == null || $shipping_origin_country == ''){
-		$shipping_origin_country = 223;
-		$shipping_origin_zip = '01801';
-		
-		$_SESSION['cart']->add_review_reason('SHIPPING_ORIGIN');
-	}
-	
-	$package_origin_zip = $shipping_origin_zip;
-	$country_name = zen_get_countries($shipping_origin_country, true);
-	$package_origin_iso =  $country_name['countries_iso_code_2'];
-	$package_destination_zip =   $order->delivery['postcode'];
-	$package_destination_iso = $order->delivery['country']['iso_code_2'];
-	
-	if($package_origin_iso == $package_destination_iso) {
-		$shipping_weight = $shipping_domestic_weight;
-	} else {
-		$shipping_weight = $shipping_international_weight;
-	}
     $ups_shipping_weight = ($shipping_weight < 0.1 ? 0.1 : $shipping_weight);
-	
-	if($ups_shipping_weight <= 150) {
-		$upsQuote = $this->get_ups_rate($package_origin_zip, $package_origin_iso, $package_destination_zip, $package_destination_iso, $ups_shipping_weight,$method);
-	} else {
-	
-	    $max_package_weight = 150;
-	    $remainder_shipping_weight = $ups_shipping_weight % $max_package_weight;
-		$max_weight_package_count = floor($ups_shipping_weight / $max_package_weight);
-	
-		for ($i = 0; $i < $max_weight_package_count; $i++){
-			$all_ups_quotes = $this->get_ups_rate($package_origin_zip, $package_origin_iso, $package_destination_zip, $package_destination_iso, $max_package_weight,$method);
-				
-			foreach($all_ups_quotes as $product_quote) {
-				foreach($product_quote as $product => $amount) {
-					$product_quote_totals[$product] += $amount;
-				}
-			}	
-		}
-		if($remainder_shipping_weight > 0) {
-			$all_ups_quotes = $this->get_package_quote($package_origin_zip, $package_origin_iso, $package_destination_zip, $package_destination_iso, $remainder_shipping_weight);
-			foreach($all_ups_quotes as $product_quote) {
-				foreach($product_quote as $product => $amount) {
-						$product_quote_totals[$product] += $amount;
-				}
-			}	
-		}
-		//Convert the totals to the expected UPS QUote
-		foreach($product_quote_totals as $product => $amount) {
-			$upsQuote[] = array($product => $amount);
-		}
-	}		
-	
-	//Calculate each packed box as a seperate shipment
-	//foreach($shipping_packages as $package) {
-///		
-//			if($package_origin_iso == $package_destination_iso) {
-///				$package_weight = $package['domestic'];
-//			} else {
-//				$package_weight = $package['international'];
-//			}
-//			
-//			if ($package_weight != 0) {
-//				$all_ups_quotes = $this->get_package_quote($package_origin_zip, $package_origin_iso, $package_destination_zip, $package_destination_iso, $package_weight);
-//			
-//				foreach($all_ups_quotes as $product_quote) {
-//					foreach($product_quote as $product => $amount) {
-//						//print "$product: $amount<br>";
-//						$product_quote_totals[$product] += $amount;
-//					}
-//				}	
-//				//print '----<br/>';
-//			}
-//		}
-//		foreach($product_quote_totals as $product => $amount) {
-			//print "$product: $amount<br>";
-//			$upsQuote[] = array($product => $amount);
-//		}
-	
-//	$reason_string = '';
-//	$reasons = $_SESSION['cart']->get_review_reasons();
-//	foreach($reasons as $reason){
-//		$reason_string = $reason_string . ' - ' . $reason;
-//	}
-//	$reason_string = $reason_string . '  -  ';
-	
+
+    $country_name = zen_get_countries(SHIPPING_ORIGIN_COUNTRY, true);
+    $this->_upsOrigin(SHIPPING_ORIGIN_ZIP, $country_name['countries_iso_code_2']);
+    $this->_upsDest($order->delivery['postcode'], $order->delivery['country']['iso_code_2']);
+    $this->_upsRate(MODULE_SHIPPING_UPS_PICKUP);
+    $this->_upsContainer(MODULE_SHIPPING_UPS_PACKAGE);
+    $this->_upsWeight($ups_shipping_weight);
+    $this->_upsRescom(MODULE_SHIPPING_UPS_RES);
+    $upsQuote = $this->_upsGetQuote();
+
     if ( (is_array($upsQuote)) && (sizeof($upsQuote) > 0) ) {
       switch (SHIPPING_BOX_WEIGHT_DISPLAY) {
         case (0):
@@ -433,28 +156,30 @@ class ups extends base {
         $show_box_weight = ' (' . number_format($ups_shipping_weight * $shipping_num_boxes,2) . TEXT_SHIPPING_WEIGHT . ')';
         break;
         default:
-        $show_box_weight = ' (' .   number_format($ups_shipping_weight,2) . TEXT_SHIPPING_WEIGHT . ' - ' . count($shipping_packages) . ' ' . TEXT_SHIPPING_BOXES .  ')';
+        $show_box_weight = ' (' . $shipping_num_boxes . ' x ' . number_format($ups_shipping_weight,2) . TEXT_SHIPPING_WEIGHT . ')';
         break;
       }
       $this->quotes = array('id' => $this->code,
                             'module' => $this->title . $show_box_weight);
 
       $methods = array();
+      // BOF: UPS USPS
       $allowed_methods = explode(", ", MODULE_SHIPPING_UPS_TYPES);
       $std_rcd = false;
+      // EOF: UPS USPS
       $qsize = sizeof($upsQuote);
       for ($i=0; $i<$qsize; $i++) {
         list($type, $cost) = each($upsQuote[$i]);
-		
+        // BOF: UPS USPS
         if ($type=='STD') {
           if ($std_rcd) continue;
           else $std_rcd = true;
         }
         if (!in_array($type, $allowed_methods)) continue;
-        
+        // EOF: UPS USPS
         $methods[] = array('id' => $type,
                            'title' => $this->types[$type],
-                           'cost' => ($cost + MODULE_SHIPPING_UPS_HANDLING) );
+                           'cost' => ($cost + MODULE_SHIPPING_UPS_HANDLING) * $shipping_num_boxes);
       }
 
       $this->quotes['methods'] = $methods;
@@ -471,7 +196,6 @@ class ups extends base {
 
     return $this->quotes;
   }
-  
   /**
    * check status of module
    *
@@ -485,7 +209,6 @@ class ups extends base {
     }
     return $this->_check;
   }
-  
   /**
    * Install this module
    *
@@ -501,10 +224,11 @@ class ups extends base {
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ('Tax Basis', 'MODULE_SHIPPING_UPS_TAX_BASIS', 'Shipping', 'On what basis is Shipping Tax calculated. Options are<br />Shipping - Based on customers Shipping Address<br />Billing Based on customers Billing address<br />Store - Based on Store address if Billing/Shipping Zone equals Store zone', '6', '0', 'zen_cfg_select_option(array(\'Shipping\', \'Billing\', \'Store\'), ', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, use_function, set_function, date_added) values ('Shipping Zone', 'MODULE_SHIPPING_UPS_ZONE', '0', 'If a zone is selected, only enable this shipping method for that zone.', '6', '0', 'zen_get_zone_class_title', 'zen_cfg_pull_down_zone_classes(', now())");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort order of display.', 'MODULE_SHIPPING_UPS_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
+    // BOF: UPS USPS
+    //      $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ( 'Shipping Methods', 'MODULE_SHIPPING_UPS_TYPES', 'Nxt AM,Nxt AM Ltr,Nxt,Nxt Ltr,Nxt PR,Nxt Save,Nxt Save Ltr,2nd AM,2nd AM Ltr,2nd,2nd Ltr,3 Day Select,Ground,Canada,World Xp,World Xp Ltr, World Xp Plus,World Xp Plus Ltr,World Expedite', 'Select the USPS services to be offered.', '6', '13', 'zen_cfg_select_multioption(array(\'1DM\',\'1DML\', \'1DA\', \'1DAL\', \'1DAPI\', \'1DP\', \'1DPL\', \'2DM\', \'2DML\', \'2DA\', \'2DAL\', \'3DS\',\'GND\', \'STD\', \'XPR\', \'XPRL\', \'XDM\', \'XDML\', \'XPD\'), ', now() )");
     $db->Execute("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, set_function, date_added) values ( 'Shipping Methods: <br />Nxt AM, Nxt AM Ltr, Nxt, Nxt Ltr, Nxt PR, Nxt Save, Nxt Save Ltr, 2nd AM, 2nd AM Ltr, 2nd, 2nd Ltr, 3 Day Select, Ground, Canada,World Xp, World Xp Ltr, World Xp Plus, World Xp Plus Ltr, World Expedite, WorldWideSaver', 'MODULE_SHIPPING_UPS_TYPES', '1DM, 1DML, 1DA, 1DAL, 1DAPI, 1DP, 1DPL, 2DM, 2DML, 2DA, 2DAL, 3DS, GND, STD, XPR, XPRL, XDM, XDML, XPD, WXS', 'Select the UPS services to be offered.', '6', '13', 'zen_cfg_select_multioption(array(\'1DM\',\'1DML\', \'1DA\', \'1DAL\', \'1DAPI\', \'1DP\', \'1DPL\', \'2DM\', \'2DML\', \'2DA\', \'2DAL\', \'3DS\',\'GND\', \'STD\', \'XPR\', \'XPRL\', \'XDM\', \'XDML\', \'XPD\', \'WXS\'), ', now() )");
-
+    // EOF: UPS USPS
   }
-  
   /**
    * Remove this module
    *
@@ -513,7 +237,6 @@ class ups extends base {
     global $db;
     $db->Execute("delete from " . TABLE_CONFIGURATION . " where configuration_key like 'MODULE_SHIPPING_UPS_%' ");
   }
-  
   /**
    * Build array of keys used for installing/managing this module
    *
@@ -522,6 +245,210 @@ class ups extends base {
   function keys() {
     return array('MODULE_SHIPPING_UPS_STATUS', 'MODULE_SHIPPING_UPS_PICKUP', 'MODULE_SHIPPING_UPS_PACKAGE', 'MODULE_SHIPPING_UPS_RES', 'MODULE_SHIPPING_UPS_HANDLING', 'MODULE_SHIPPING_UPS_TAX_CLASS', 'MODULE_SHIPPING_UPS_TAX_BASIS', 'MODULE_SHIPPING_UPS_ZONE', 'MODULE_SHIPPING_UPS_SORT_ORDER', 'MODULE_SHIPPING_UPS_TYPES');
   }
-  
+  /**
+   * Set UPS Product Code
+   *
+   * @param string $prod
+   */
+  function _upsProduct($prod){
+    $this->_upsProductCode = $prod;
+  }
+  /**
+   * Set UPS Origin details
+   *
+   * @param string $postal
+   * @param string $country
+   */
+  function _upsOrigin($postal, $country){
+    $this->_upsOriginPostalCode = substr($postal, 0, 5);
+    $this->_upsOriginCountryCode = $country;
+  }
+  /**
+   * Set UPS Destination information
+   *
+   * @param string $postal
+   * @param string $country
+   */
+  function _upsDest($postal, $country){
+    $postal = str_replace(' ', '', $postal);
+
+    if ($country == 'US') {
+      $this->_upsDestPostalCode = substr($postal, 0, 5);
+    } else {
+      $this->_upsDestPostalCode = substr($postal, 0, 6);
+    }
+
+    $this->_upsDestCountryCode = $country;
+  }
+  /**
+   * Set UPS rate-quote method
+   *
+   * @param string $foo
+   */
+  function _upsRate($foo) {
+    switch ($foo) {
+      case 'RDP':
+      $this->_upsRateCode = 'Regular+Daily+Pickup';
+      break;
+      case 'OCA':
+      $this->_upsRateCode = 'On+Call+Air';
+      break;
+      case 'OTP':
+      $this->_upsRateCode = 'One+Time+Pickup';
+      break;
+      case 'LC':
+      $this->_upsRateCode = 'Letter+Center';
+      break;
+      case 'CC':
+      $this->_upsRateCode = 'Customer+Counter';
+      break;
+    }
+  }
+  /**
+   * Set UPS Container type
+   *
+   * @param string $foo
+   */
+  function _upsContainer($foo) {
+    switch ($foo) {
+      case 'CP': // Customer Packaging
+        $this->_upsContainerCode = '00';
+        break;
+      case 'ULE': // UPS Letter Envelope
+        $this->_upsContainerCode = '01';
+        break;
+      case 'UT': // UPS Tube
+        $this->_upsContainerCode = '03';
+        break;
+      case 'UEB': // UPS Express Box
+        $this->_upsContainerCode = '21';
+        break;
+      case 'UW25': // UPS Worldwide 25 kilo
+        $this->_upsContainerCode = '24';
+        break;
+      case 'UW10': // UPS Worldwide 10 kilo
+        $this->_upsContainerCode = '25';
+        break;
+    }
+  }
+  /**
+   * Set UPS package weight
+   *
+   * @param string $foo
+   */
+  function _upsWeight($foo) {
+    $this->_upsPackageWeight = $foo;
+  }
+  /**
+   * Set UPS address-quote method (residential vs commercial)
+   *
+   * @param string $foo
+   */
+  function _upsRescom($foo) {
+    switch ($foo) {
+      case 'RES': // Residential Address
+        $this->_upsResComCode = '1';
+        break;
+      case 'COM': // Commercial Address
+        $this->_upsResComCode = '0';
+        break;
+    }
+  }
+  /**
+   * Set UPS Action method
+   *
+   * @param string/integer $action
+   */
+  function _upsAction($action) {
+    /* 3 - Single Quote
+    4 - All Available Quotes */
+
+    $this->_upsActionCode = $action;
+  }
+  /**
+   * Sent request for quote to UPS via older HTML method
+   *
+   * @return array
+   */
+  function _upsGetQuote() {
+    if (!isset($this->_upsActionCode)) $this->_upsActionCode = '4';
+
+    $request = join('&', array('accept_UPS_license_agreement=yes',
+                               '10_action=' . $this->_upsActionCode,
+                               '13_product=' . $this->_upsProductCode,
+                               '14_origCountry=' . $this->_upsOriginCountryCode,
+                               '15_origPostal=' . $this->_upsOriginPostalCode,
+                               '19_destPostal=' . $this->_upsDestPostalCode,
+                               '22_destCountry=' . $this->_upsDestCountryCode,
+                               '23_weight=' . $this->_upsPackageWeight,
+                               '47_rate_chart=' . $this->_upsRateCode,
+                               '48_container=' . $this->_upsContainerCode,
+                               '49_residential=' . $this->_upsResComCode));
+    $http = new httpClient();
+    if ($http->Connect('www.ups.com', 80)) {
+      $http->addHeader('Host', 'www.ups.com');
+      $http->addHeader('User-Agent', 'Zen Cart');
+      $http->addHeader('Connection', 'Close');
+
+      if ($http->Get('/using/services/rave/qcostcgi.cgi?' . $request)) $body = $http->getBody();
+
+      $http->Disconnect();
+    } else {
+      return 'error';
+    }
+
+    // BOF: UPS USPS
+    /*
+    TEST by checking out in the catalog; try a variety of shipping destinations to be sure
+    your customers will be properly served.  If you are not getting any quotes, try enabling
+    more alternatives in admin. Make sure your store's postal code is set in Admin ->
+    Configuration -> Shipping/Packaging, since you won't get any quotes unless there is
+    a origin that UPS recognizes.
+
+    If you STILL don't get any quotes, here is a way to find out exactly what UPS is sending
+    back in response to rate quote request, you can uncomment the following mail() line and 
+    then check your email after visiting the shipping page in checkout ...
+    */
+    //mail(STORE_OWNER_EMAIL_ADDRESS, 'UPS response', $body, 'From: <'.STORE_OWNER_EMAIL_ADDRESS.'>');
+    
+    // EOF: UPS USPS
+
+    $body_array = explode("\n", $body);
+
+/* //DEBUG ONLY
+    $n = sizeof($body_array);
+    for ($i=0; $i<$n; $i++) {
+      $result = explode('%', $body_array[$i]);
+      print_r($result);
+    }
+    die('END');
+*/
+
+    $returnval = array();
+    $errorret = 'error'; // only return 'error' if NO rates returned
+
+    $n = sizeof($body_array);
+    for ($i=0; $i<$n; $i++) {
+      $result = explode('%', $body_array[$i]);
+      $errcode = substr($result[0], -1);
+      switch ($errcode) {
+        case 3:
+        if (is_array($returnval)) $returnval[] = array($result[1] => $result[10]);
+        break;
+        case 4:
+        if (is_array($returnval)) $returnval[] = array($result[1] => $result[10]);
+        break;
+        case 5:
+        $errorret = $result[1];
+        break;
+        case 6:
+        if (is_array($returnval)) $returnval[] = array($result[3] => $result[10]);
+        break;
+      }
+    }
+    if (empty($returnval)) $returnval = $errorret;
+
+    return $returnval;
+  }
 }
 ?>

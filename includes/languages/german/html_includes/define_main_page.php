@@ -1,1 +1,0 @@
-<p><strong><font face="verdana,arial,helvetica,sans-serif">Falls Sie bei Ihrem Einkauf Hilfe brauchen, rufen Sie bitte unsere wiTECH Support Line unter der Nummer + 888-948-3241 an.</font></strong></p>

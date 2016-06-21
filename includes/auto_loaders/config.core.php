@@ -15,7 +15,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  * 
  * require(DIR_WS_CLASSES . 'class.base.php'); 
  * require(DIR_WS_CLASSES . 'class.notifier.php');
- * $zco_notifier = new notifier();
+ * $zco_notifier = new notifier()'
  * require(DIR_WS_CLASSES . 'mime.php'); 
  * require(DIR_WS_CLASSES . 'email.php'); 
  * require(DIR_WS_CLASSES . 'boxes.php'); 
@@ -68,13 +68,7 @@ if (!defined('IS_ADMIN_FLAG')) {
   $autoLoadConfig[0][] = array('autoType'=>'class',
                                 'loadFile'=>'message_stack.php');
   $autoLoadConfig[0][] = array('autoType'=>'class',
-	                            'loadFile'=>'breadcrumb.php');
-                                
-  // Additional customers fields.
-  $autoLoadConfig[0][] = array('autoType'=>'class',
-	                            'loadFile'=>'addcustomersfields.php');
- // End of additional customers fields.
-  
+                                'loadFile'=>'breadcrumb.php');
 /**
  * Breakpoint 10.
  * 
@@ -152,7 +146,7 @@ if (!defined('IS_ADMIN_FLAG')) {
  * Breakpoint 80.
  * 
  * if(!$_SESSION['cart']) $_SESSION['cart'] = new shoppingCart();
- * if(!$_SESSION['navigation']) $_SESSION['navigation'] = new navigationHistory();
+ * if(!$_SESSION['navigaton']) $_SESSION['navigation'] = new navigaionHistory();
  * 
  */
   $autoLoadConfig[80][] = array('autoType'=>'classInstantiate',
@@ -165,15 +159,6 @@ if (!defined('IS_ADMIN_FLAG')) {
                                 'objectName'=>'navigation',
                                 'checkInstantiated'=>true,
                                 'classSession'=>true);
-  
-  // Additional customers fields.
-  $autoLoadConfig[80][] = array('autoType'=>'classInstantiate',
-                                'className'=>'addCustomersFields',
-                                'objectName'=>'customersFields',
-                                'checkInstantiated'=>true,
-                                'classSession'=>true);
-  // End of additional customers fields.
-  
 /**
  * Breakpoint 90.
  * 
@@ -273,14 +258,4 @@ if (!defined('IS_ADMIN_FLAG')) {
  */
   $autoLoadConfig[180][] = array('autoType'=>'init_script',
                                  'loadFile'=> 'init_header.php');
-/**
- * Breakpoint 190.
- * 
- * require('includes/init_includes/init_addcustomersfields.php'); 
- * 
- */
- // Additional customers fields.
-  $autoLoadConfig[180][] = array('autoType'=>'init_script',
-                                 'loadFile'=> 'init_addcustomersfields.php');
- // End of additional customers fields.
 ?>

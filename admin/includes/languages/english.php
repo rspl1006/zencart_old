@@ -17,7 +17,7 @@ define('HEADER_LOGO_IMAGE', 'logo.gif');
 // on RedHat6.0 I used 'en_US'
 // on FreeBSD 4.0 I use 'en_US.ISO_8859-1'
 // this may not work under win32 environments..
-setlocale(LC_TIME, 'en_US.UTF-8');
+setlocale(LC_TIME, 'en_US.ISO_8859-1');
 define('DATE_FORMAT_SHORT', '%m/%d/%Y');  // this is used for strftime()
 define('DATE_FORMAT_LONG', '%A %d %B, %Y'); // this is used for strftime()
 define('DATE_FORMAT', 'm/d/Y'); // this is used for date()
@@ -60,7 +60,7 @@ define('TEXT_INFO_META_TAGS_USAGE', '<strong>NOTE:</strong> The Site/Tagline is 
 define('HTML_PARAMS','dir="ltr" lang="en"');
 
 // charset for web pages and emails
-define('CHARSET', 'utf-8');
+define('CHARSET', 'iso-8859-1');
 
 // header text in includes/header.php
 define('HEADER_TITLE_TOP', 'Admin Home');
@@ -672,31 +672,6 @@ define('ENTRY_NOTHING_TO_SEND','You haven\'t entered any content for your messag
 // include additional files:
   require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . FILENAME_EMAIL_EXTRAS);
   include(zen_get_file_directory(DIR_FS_CATALOG_LANGUAGES . $_SESSION['language'] . '/', FILENAME_OTHER_IMAGES_NAMES, 'false'));
-
-  
-  define('MODULE_PAYMENT_WIRE_TRANSFER_TEXT_TITLE', 'Wire Transfer');
-  define('MODULE_PAYMENT_WIRE_TRANSFER_TEXT_DESCRIPTION', 'Wire Transfer');
-  define('MODULE_PAYMENT_WIRE_TRANSFER_DESCRIPTION', 'An order confirmation will be sent via email from the wiTECH system. A wiTECH representative will call or e-mail you with the bank information for the wire transfer.  Your order will ship when we receive notification of your payment in full.');
- 
-  define('MODULE_PAYMENT_MONEY_ORDER_TEXT_TITLE', 'Money Order');
-  define('MODULE_PAYMENT_MONEY_ORDER_TEXT_DESCRIPTION', 'Money Order');
-  define('MODULE_PAYMENT_MONEY_ORDER_DESCRIPTION', 'An order confirmation will be sent via email from the wiTECH system. Please make money orders payable to Security Inspection, Inc.  Your order will ship when we receive your money order for payment in full.');
-  define('MODULE_PAYMENT_MONEY_ORDER_INVOICE_NOTE', 'Please make money orders payable to Security Inspection, Inc. and remit payment to Security Inspection, Inc., 2619 Product Drive Ste. 100, Rochester Hills, MI  48309.');
-
-  define('MODULE_PAYMENT_PURCHASE_ORDER_TEXT_TITLE', 'Purchase Order');
-  define('MODULE_PAYMENT_PURCHASE_ORDER_TEXT_DESCRIPTION', 'Purchase Order');
-  define('MODULE_PAYMENT_PURCHASE_ORDER_DESCRIPTION', 'An order confirmation will be sent via email from the wiTECH system. A wiTECH representative will call or e-mail you requesting a copy of the purchase order.  Your order will ship when we receive a copy of the purchase order and it is reviewed for accuracy.');
-  define('MODULE_PAYMENT_PURCHASE_ORDER_INVOICE_NOTE', 'Please include bill to and ship to address on the purchase order. Vendor information is Security Inspection, Inc.  2619 Product Drive Ste. 100, Rochester Hills, MI  48309.  When the order is shipped an invoice will be generated for payment.');
-
-  define('MODULE_PAYMENT_CHECKS_TEXT_TITLE', 'Check');
-  define('MODULE_PAYMENT_CHECKS_TEXT_DESCRIPTION', 'Check');
-  define('MODULE_PAYMENT_CHECKS_DESCRIPTION', 'An order confirmation will be sent via email from the wiTECH system with remittance information.  Please make checks payable to Security Inspection, Inc.  Your order will ship when we receive your check for payment in full.');
-  define('MODULE_PAYMENT_CHECKS_INVOICE_NOTE', 'Please make checks payable to Security Inspection, Inc. and remit payment to Security Inspection, Inc., 2619 Product Drive Ste. 100, Rochester Hills, MI  48309');
-
-  define('MODULE_PAYMENT_CHRYSLER_PO_TEXT_TITLE', 'Chrysler PO');
-  define('MODULE_PAYMENT_CHRYSLER_PO_TEXT_DESCRIPTION', 'Chrysler PO');
-  define('MODULE_PAYMENT_CHRYSLER_PO_DESCRIPTION', 'An order confirmation will be sent via email from the wiTECH system.');
-  define('MODULE_PAYMENT_CHRYSLER_PO_INVOICE_NOTE', '');
 
 
 ?>

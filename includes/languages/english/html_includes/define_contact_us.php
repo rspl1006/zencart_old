@@ -1,2 +1,3 @@
-<p><strong>If you have any questions or need assistance in placing your order, please contact the wiTECH Premium Help Desk at 1-888-witech-1 (1-888-948-3241).</strong></p>
-<p>All messages will be responded to within one week.</p>
+<p><strong>Contact Us Sample Text ...</strong></p>
+<p>This section of text is from the Define Pages Editor located under Tools in the Admin.</p>
+<p>To remove this section of the text, delete it from the Define Pages Editor.</p>

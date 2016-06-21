@@ -34,9 +34,7 @@ switch ($_GET['action']) {
    * delete checkbox or 0 quantity removes from cart
    */
   case 'update_product' :
-   
   $_SESSION['cart']->actionUpdateProduct($goto, $parameters);
-
   break;
   /**
    * customer adds a product from the products page

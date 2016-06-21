@@ -1,1 +1,0 @@
-Please read the docs/manual.ppt first as well as the TXT files before doing anything else !

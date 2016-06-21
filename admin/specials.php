@@ -35,97 +35,31 @@
         $tmp_value = zen_db_prepare_input($_POST['specials_price']);
         $specials_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
 
-// DJS MOD 06/10/2009
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_a_price']);
-        $specials_new_products_group_a_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_b_price']);
-        $specials_new_products_group_b_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_c_price']);
-        $specials_new_products_group_c_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_d_price']);
-        $specials_new_products_group_d_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-		//if (substr($specials_price, -1) == '%') {
-        if (substr($specials_price, -1) == '%' || substr($specials_new_products_group_a_price, -1) == '%' || substr($specials_new_products_group_b_price, -1) == '%' || substr($specials_new_products_group_c_price, -1) == '%' || substr($specials_new_products_group_d_price, -1) == '%') {
-
-/*          $new_special_insert = $db->Execute("select products_id, products_price, products_priced_by_attribute
+        if (substr($specials_price, -1) == '%') {
+          $new_special_insert = $db->Execute("select products_id, products_price, products_priced_by_attribute
                                               from " . TABLE_PRODUCTS . "
                                               where products_id = '" . (int)$products_id . "'");
-*/
-          $new_special_insert = $db->Execute("select products_id, products_price
-												, products_group_a_price
-												, products_group_b_price
-												, products_group_c_price
-												, products_group_d_price
-												, products_priced_by_attribute
-                                              from " . TABLE_PRODUCTS . "
-                                              where products_id = '" . (int)$products_id . "'");
-// END DJS MOD
+
 // check if priced by attribute
           if ($new_special_insert->fields['products_priced_by_attribute'] == '1') {
             $products_price = zen_get_products_base_price($products_id);
           } else {
             $products_price = $new_special_insert->fields['products_price'];
-// DJS MOD 06/10/2009
-            $products_group_a_price = $new_special_insert->fields['products_group_a_price'];
-            $products_group_b_price = $new_special_insert->fields['products_group_b_price'];
-            $products_group_c_price = $new_special_insert->fields['products_group_c_price'];
-            $products_group_d_price = $new_special_insert->fields['products_group_d_price'];
-// END DJS MOD
           }
 
-// DJS MOD 06/10/2009
-          //$specials_price = ($products_price - (($specials_price / 100) * $products_price));
-		  if (substr($specials_price, -1) == '%') {
-          	$specials_price = ($products_price - (($specials_price / 100) * $products_price));
-		  }
-		  if (substr($specials_new_products_group_a_price, -1) == '%') {
-            $specials_new_products_group_a_price = ($products_group_a_price - (($specials_new_products_group_a_price / 100) * $products_group_a_price));
-		  }
-		  if (substr($specials_new_products_group_b_price, -1) == '%') {
-            $specials_new_products_group_b_price = ($products_group_b_price - (($specials_new_products_group_b_price / 100) * $products_group_b_price));
-		  }
-		  if (substr($specials_new_products_group_c_price, -1) == '%') {
-            $specials_new_products_group_c_price = ($products_group_c_price - (($specials_new_products_group_c_price / 100) * $products_group_c_price));
-		  }
-		  if (substr($specials_new_products_group_d_price, -1) == '%') {
-            $specials_new_products_group_d_price = ($products_group_d_price - (($specials_new_products_group_d_price / 100) * $products_group_d_price));
-		  }
-// END DJS MOD
+          $specials_price = ($products_price - (($specials_price / 100) * $products_price));
         }
 
         $specials_date_available = ((zen_db_prepare_input($_POST['start']) == '') ? '0001-01-01' : zen_date_raw($_POST['start']));
         $expires_date = ((zen_db_prepare_input($_POST['end']) == '') ? '0001-01-01' : zen_date_raw($_POST['end']));
 
         $products_id = zen_db_prepare_input($_POST['products_id']);
-
-// DJS MOD 06/10/2009
-/*        $db->Execute("insert into " . TABLE_SPECIALS . "
+        $db->Execute("insert into " . TABLE_SPECIALS . "
                     (products_id, specials_new_products_price, specials_date_added, expires_date, status, specials_date_available)
                     values ('" . (int)$products_id . "',
                             '" . zen_db_input($specials_price) . "',
                             now(),
                             '" . zen_db_input($expires_date) . "', '1', '" . zen_db_input($specials_date_available) . "')");
-*/
-        $db->Execute("insert into " . TABLE_SPECIALS . "
-                    (products_id, specials_new_products_price,
-									specials_new_products_group_a_price,
-									specials_new_products_group_b_price,
-									specials_new_products_group_c_price,
-									specials_new_products_group_d_price,
-									specials_date_added, expires_date, status, specials_date_available)
-                    values ('" . (int)$products_id . "',
-                            '" . zen_db_input($specials_price) . "',
-                            '" . zen_db_input($specials_new_products_group_a_price) . "',
-                            '" . zen_db_input($specials_new_products_group_b_price) . "',
-                            '" . zen_db_input($specials_new_products_group_c_price) . "',
-                            '" . zen_db_input($specials_new_products_group_d_price) . "',
-                            now(),
-                            '" . zen_db_input($expires_date) . "', '1', '" . zen_db_input($specials_date_available) . "')");
-// END DJS MOD
 
         $new_special = $db->Execute("select specials_id from " . TABLE_SPECIALS . " where products_id='" . (int)$products_id . "'");
 
@@ -151,81 +85,17 @@
         $tmp_value = zen_db_prepare_input($_POST['specials_price']);
         $specials_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
 
-// DJS MOD 06/10/2009
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_a_price']);
-        $specials_new_products_group_a_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_b_price']);
-        $specials_new_products_group_b_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_c_price']);
-        $specials_new_products_group_c_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-        $tmp_value = zen_db_prepare_input($_POST['specials_new_products_group_d_price']);
-        $specials_new_products_group_d_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
-//        if (substr($specials_price, -1) == '%') $specials_price = ($products_price - (($specials_price / 100) * $products_price));
-        if (substr($specials_price, -1) == '%' || substr($specials_new_products_group_a_price, -1) == '%' || substr($specials_new_products_group_b_price, -1) == '%' || substr($specials_new_products_group_c_price, -1) == '%' || substr($specials_new_products_group_d_price, -1) == '%') {
-          $new_special_insert = $db->Execute("select products_id, products_price
-												, products_group_a_price
-												, products_group_b_price
-												, products_group_c_price
-												, products_group_d_price
-												, products_priced_by_attribute
-                                              from " . TABLE_PRODUCTS . "
-                                              where products_id = '" . (int)$_POST['update_products_id'] . "'");
-// check if priced by attribute
-          if ($new_special_insert->fields['products_priced_by_attribute'] == '1') {
-            $products_price = zen_get_products_base_price($products_id);
-          } else {
-            $products_price = $new_special_insert->fields['products_price'];
-            $products_group_a_price = $new_special_insert->fields['products_group_a_price'];
-            $products_group_b_price = $new_special_insert->fields['products_group_b_price'];
-            $products_group_c_price = $new_special_insert->fields['products_group_c_price'];
-            $products_group_d_price = $new_special_insert->fields['products_group_d_price'];
-          }
-
-		  if (substr($specials_price, -1) == '%') {
-          	$specials_price = ($products_price - (($specials_price / 100) * $products_price));
-		  }
-		  if (substr($specials_new_products_group_a_price, -1) == '%') {
-            $specials_new_products_group_a_price = ($products_group_a_price - (($specials_new_products_group_a_price / 100) * $products_group_a_price));
-		  }
-		  if (substr($specials_new_products_group_b_price, -1) == '%') {
-            $specials_new_products_group_b_price = ($products_group_b_price - (($specials_new_products_group_b_price / 100) * $products_group_b_price));
-		  }
-		  if (substr($specials_new_products_group_c_price, -1) == '%') {
-            $specials_new_products_group_c_price = ($products_group_c_price - (($specials_new_products_group_c_price / 100) * $products_group_c_price));
-		  }
-		  if (substr($specials_new_products_group_d_price, -1) == '%') {
-            $specials_new_products_group_d_price = ($products_group_d_price - (($specials_new_products_group_d_price / 100) * $products_group_d_price));
-		  }
-        }
-
-// END DJS MOD
+        if (substr($specials_price, -1) == '%') $specials_price = ($products_price - (($specials_price / 100) * $products_price));
 
         $specials_date_available = ((zen_db_prepare_input($_POST['start']) == '') ? '0001-01-01' : zen_date_raw($_POST['start']));
         $expires_date = ((zen_db_prepare_input($_POST['end']) == '') ? '0001-01-01' : zen_date_raw($_POST['end']));
 
-// DJS MOD 06/10/2009
-/*        $db->Execute("update " . TABLE_SPECIALS . "
-                      set specials_new_products_price = '" . zen_db_input($specials_price) . "',
-                          specials_last_modified = now(),
-                          expires_date = '" . zen_db_input($expires_date) . "',
-                          specials_date_available = '" . zen_db_input($specials_date_available) . "'
-                      where specials_id = '" . (int)$specials_id . "'");
-*/
         $db->Execute("update " . TABLE_SPECIALS . "
                       set specials_new_products_price = '" . zen_db_input($specials_price) . "',
-						  specials_new_products_group_a_price = '" . zen_db_input($specials_new_products_group_a_price) . "',
-						  specials_new_products_group_b_price = '" . zen_db_input($specials_new_products_group_b_price) . "',
-						  specials_new_products_group_c_price = '" . zen_db_input($specials_new_products_group_c_price) . "',
-						  specials_new_products_group_d_price = '" . zen_db_input($specials_new_products_group_d_price) . "',
                           specials_last_modified = now(),
                           expires_date = '" . zen_db_input($expires_date) . "',
                           specials_date_available = '" . zen_db_input($specials_date_available) . "'
                       where specials_id = '" . (int)$specials_id . "'");
-// END DJS MOD
 
         // reset products_price_sorter for searches etc.
         $update_price = $db->Execute("select products_id from " . TABLE_SPECIALS . " where specials_id = '" . (int)$specials_id . "'");
@@ -383,8 +253,7 @@
     if ( ($action == 'edit') && isset($_GET['sID']) ) {
       $form_action = 'update';
 
-// DJS MOD 06/10/2009
-/*      $product = $db->Execute("select p.products_id, pd.products_name, p.products_price, p.products_priced_by_attribute,
+      $product = $db->Execute("select p.products_id, pd.products_name, p.products_price, p.products_priced_by_attribute,
                                       s.specials_new_products_price, s.expires_date, s.specials_date_available
                                from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd, " .
                                         TABLE_SPECIALS . " s
@@ -392,28 +261,6 @@
                                and pd.language_id = '" . (int)$_SESSION['languages_id'] . "'
                                and p.products_id = s.products_id
                                and s.specials_id = '" . (int)$_GET['sID'] . "'");
-*/
-      $product = $db->Execute("select p.products_id, pd.products_name,
-									  p.products_price,
-									  p.products_group_a_price,
-									  p.products_group_b_price,
-									  p.products_group_c_price,
-									  p.products_group_d_price,
-									  p.products_priced_by_attribute,
-                                      s.specials_new_products_price,
-									  s.specials_new_products_group_a_price,
-									  s.specials_new_products_group_b_price,
-									  s.specials_new_products_group_c_price,
-									  s.specials_new_products_group_d_price,
-									  s.expires_date, s.specials_date_available
-                               from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd, " .
-                                        TABLE_SPECIALS . " s
-                               where p.products_id = pd.products_id
-                               and pd.language_id = '" . (int)$_SESSION['languages_id'] . "'
-                               and p.products_id = s.products_id
-                               and s.specials_id = '" . (int)$_GET['sID'] . "'");
-
-// END DJS MOD
 
       $sInfo = new objectInfo($product->fields);
 
@@ -472,24 +319,7 @@ var EndDate = new ctlSpiffyCalendarBox("EndDate", "new_special", "end", "btnDate
             <td class="main"><?php echo TEXT_SPECIALS_SPECIAL_PRICE; ?>&nbsp;</td>
             <td class="main"><?php echo zen_draw_input_field('specials_price', (isset($sInfo->specials_new_products_price) ? $sInfo->specials_new_products_price : '')); echo zen_draw_hidden_field('products_priced_by_attribute', $sInfo->products_priced_by_attribute); echo zen_draw_hidden_field('update_products_id', $sInfo->products_id); ?></td>
           </tr>
-<!-- DJS MOD 06/10/2009 -->
-          <tr>
-            <td class="main"><?php echo TEXT_SPECIALS_SPECIAL_PRICE . ' (' . GROUP_PRICE_PER_ITEM1 . ')'; ?>&nbsp;</td>
-            <td class="main"><?php echo zen_draw_input_field('specials_new_products_group_a_price', (isset($sInfo->specials_new_products_group_a_price) ? $sInfo->specials_new_products_group_a_price : '')); echo zen_draw_hidden_field('products_priced_by_attribute', $sInfo->products_priced_by_attribute); echo zen_draw_hidden_field('update_products_id', $sInfo->products_id); ?>&nbsp;&nbsp;<?php echo (isset($sInfo->products_name)) ? '<small>(' . $currencies->format($sInfo->products_group_a_price) . ')</small>' : ''; ?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo TEXT_SPECIALS_SPECIAL_PRICE . ' (' . GROUP_PRICE_PER_ITEM2 . ')'; ?>&nbsp;</td>
-            <td class="main"><?php echo zen_draw_input_field('specials_new_products_group_b_price', (isset($sInfo->specials_new_products_group_b_price) ? $sInfo->specials_new_products_group_b_price : '')); echo zen_draw_hidden_field('products_priced_by_attribute', $sInfo->products_priced_by_attribute); echo zen_draw_hidden_field('update_products_id', $sInfo->products_id); ?>&nbsp;&nbsp;<?php echo (isset($sInfo->products_name)) ? '<small>(' . $currencies->format($sInfo->products_group_b_price) . ')</small>' : ''; ?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo TEXT_SPECIALS_SPECIAL_PRICE . ' (' . GROUP_PRICE_PER_ITEM3 . ')'; ?>&nbsp;</td>
-            <td class="main"><?php echo zen_draw_input_field('specials_new_products_group_c_price', (isset($sInfo->specials_new_products_group_c_price) ? $sInfo->specials_new_products_group_c_price : '')); echo zen_draw_hidden_field('products_priced_by_attribute', $sInfo->products_priced_by_attribute); echo zen_draw_hidden_field('update_products_id', $sInfo->products_id); ?>&nbsp;&nbsp;<?php echo (isset($sInfo->products_name)) ? '<small>(' . $currencies->format($sInfo->products_group_c_price) . ')</small>' : ''; ?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo TEXT_SPECIALS_SPECIAL_PRICE . ' (' . GROUP_PRICE_PER_ITEM4 . ')'; ?>&nbsp;</td>
-            <td class="main"><?php echo zen_draw_input_field('specials_new_products_group_d_price', (isset($sInfo->specials_new_products_group_d_price) ? $sInfo->specials_new_products_group_d_price : '')); echo zen_draw_hidden_field('products_priced_by_attribute', $sInfo->products_priced_by_attribute); echo zen_draw_hidden_field('update_products_id', $sInfo->products_id); ?>&nbsp;&nbsp;<?php echo (isset($sInfo->products_name)) ? '<small>(' . $currencies->format($sInfo->products_group_d_price) . ')</small>' : ''; ?></td>
-          </tr>
-<!-- END DJS MOD -->
+
           <tr>
             <td class="main"><?php echo TEXT_SPECIALS_AVAILABLE_DATE; ?>&nbsp;</td>
             <td class="main"><script language="javascript">StartDate.writeControl(); StartDate.dateFormat="<?php echo DATE_FORMAT_SPIFFYCAL; ?>";</script></td>

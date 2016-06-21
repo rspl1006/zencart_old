@@ -19,7 +19,7 @@
 <div class="navNextPrevWrapper centeredContent">
 <?php
 // only display when more than 1
-  if (false) {
+  if ($products_found_count > 1) {
 ?>
 <p class="navNextPrevCounter"><?php echo (PREV_NEXT_PRODUCT); ?><?php echo ($position+1 . "/" . $counter); ?></p>
 <div class="navNextPrevList"><a href="<?php echo zen_href_link(zen_get_info_page($previous), "cPath=$cPath&products_id=$previous"); ?>"><?php echo $previous_image . $previous_button; ?></a></div>

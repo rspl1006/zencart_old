@@ -16,29 +16,7 @@ if (!defined('IS_ADMIN_FLAG')) {
                        'products_quantity' => '',
                        'products_model' => '',
                        'products_image' => '',
-                       'products_type' => '',
-                       'products_declared_value' => '',
                        'products_price' => '',
-                       'products_group_a_price' => '',
-                       'products_group_b_price' => '',
-                       'products_group_c_price' => '',
-                       'products_group_d_price' => '',
-                       'products_group_e_price' => '',
-                       'products_group_f_price' => '',
-                       'products_group_g_price' => '',
-                       'products_group_h_price' => '',
-                       'products_group_i_price' => '',
-                       'products_group_j_price' => '',
-                       'products_group_k_price' => '',
-                       'products_group_l_price' => '',
-                       'products_group_m_price' => '',
-                       'products_group_n_price' => '',
-                       'products_group_o_price' => '',
-                       'products_group_p_price' => '',
-                       'products_group_q_price' => '',
-                       'products_group_r_price' => '',
-                       'products_group_s_price' => '',
-                       'products_group_t_price' => '',
                        'products_virtual' => DEFAULT_PRODUCT_PRODUCTS_VIRTUAL,
                        'products_weight' => '',
                        'products_date_added' => '',
@@ -60,15 +38,7 @@ if (!defined('IS_ADMIN_FLAG')) {
                        'products_discount_type' => '0',
                        'products_discount_type_from' => '0',
                        'products_price_sorter' => '0',
-                       'master_categories_id' => '',
-					   'package_as_accessory' => '0',
-					   'package_one_length' => '0',
-					   'package_one_width' => '0',
-					   'package_one_height' => '0',
-					   'package_two_length' => '0',
-					   'package_two_width' => '0',
-					   'package_two_height' => '0',
-					   'require_witech_system' => '0'
+                       'master_categories_id' => ''
                        );
 
     $pInfo = new objectInfo($parameters);
@@ -76,27 +46,7 @@ if (!defined('IS_ADMIN_FLAG')) {
     if (isset($_GET['pID']) && empty($_POST)) {
       $product = $db->Execute("select pd.products_name, pd.products_description, pd.products_url,
                                       p.products_id, p.products_quantity, p.products_model,
-                                      p.products_image, p.products_type, p.products_declared_value,p.products_price, p.products_virtual, p.products_weight,
-                                      p.products_group_a_price,
-                                      p.products_group_b_price, 
-                                      p.products_group_c_price,
-                                      p.products_group_d_price,
-                                      p.products_group_e_price,
-                                      p.products_group_f_price,
-                                      p.products_group_g_price,
-                                      p.products_group_h_price,
-                                      p.products_group_i_price,
-                                      p.products_group_j_price,
-                                      p.products_group_k_price,
-                                      p.products_group_l_price,
-                                      p.products_group_m_price,
-                                      p.products_group_n_price,
-                                      p.products_group_o_price,
-                                      p.products_group_p_price,
-                                      p.products_group_q_price,
-                                      p.products_group_r_price,
-                                      p.products_group_s_price,
-                                      p.products_group_t_price,
+                                      p.products_image, p.products_price, p.products_virtual, p.products_weight,
                                       p.products_date_added, p.products_last_modified,
                                       date_format(p.products_date_available, '%Y-%m-%d') as
                                       products_date_available, p.products_status, p.products_tax_class_id,
@@ -106,11 +56,7 @@ if (!defined('IS_ADMIN_FLAG')) {
                                       p.product_is_always_free_shipping, p.products_qty_box_status, p.products_quantity_order_max,
                                       p.products_sort_order,
                                       p.products_discount_type, p.products_discount_type_from,
-                                      p.products_price_sorter, p.master_categories_id, p.package_as_accessory,
-									  p.package_one_length, p.package_one_width, p.package_one_height,
-									  p.package_two_length, p.package_two_width, p.package_two_height,
-									  p.require_witech_system
-									  
+                                      p.products_price_sorter, p.master_categories_id
                               from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
                               where p.products_id = '" . (int)$_GET['pID'] . "'
                               and p.products_id = pd.products_id
@@ -123,11 +69,7 @@ if (!defined('IS_ADMIN_FLAG')) {
       $products_description = $_POST['products_description'];
       $products_url = $_POST['products_url'];
     }
-    $group_pricing = $db->Execute("select group_name from " . TABLE_GROUP_PRICING . " group_pricing");
-    while (!$group_pricing->EOF) {
-      $group_pricing_array[] = $group_pricing->fields['group_name'];
-      $group_pricing->MoveNext();
-    }
+
     $manufacturers_array = array(array('id' => '', 'text' => TEXT_NONE));
     $manufacturers = $db->Execute("select manufacturers_id, manufacturers_name
                                    from " . TABLE_MANUFACTURERS . " order by manufacturers_name");
@@ -252,194 +194,25 @@ function getTaxRate() {
 
 function updateGross() {
   var taxRate = getTaxRate();
+  var grossValue = document.forms["new_product"].products_price.value;
 
-  updateGrossPrices("products_price", "products_price_gross", taxRate);
+  if (taxRate > 0) {
+    grossValue = grossValue * ((taxRate / 100) + 1);
+  }
 
-  <?php
-     foreach ($group_pricing_array as $group) {
-       if ($group == GROUP_PRICE_PER_ITEM1) {
-               ?>updateGrossPrices("products_group_a_price", "products_group_a_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM2) {
-               ?>updateGrossPrices("products_group_b_price", "products_group_b_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM3) {
-                ?>updateGrossPrices("products_group_c_price", "products_group_c_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM4) {
-                ?>updateGrossPrices("products_group_d_price", "products_group_d_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM5) {
-                ?>updateGrossPrices("products_group_e_price", "products_group_e_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM6) {
-                ?>updateGrossPrices("products_group_f_price", "products_group_f_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM7) {
-                ?>updateGrossPrices("products_group_g_price", "products_group_g_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM8) {
-                ?>updateGrossPrices("products_group_h_price", "products_group_h_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM9) {
-                ?>updateGrossPrices("products_group_i_price", "products_group_i_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM10) {
-                ?>updateGrossPrices("products_group_j_price", "products_group_j_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM11) {
-                ?>updateGrossPrices("products_group_k_price", "products_group_k_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM12) {
-                ?>updateGrossPrices("products_group_l_price", "products_group_l_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM13) {
-                ?>updateGrossPrices("products_group_m_price", "products_group_m_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM14) {
-                ?>updateGrossPrices("products_group_n_price", "products_group_n_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM15) {
-                ?>updateGrossPrices("products_group_o_price", "products_group_o_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM16) {
-                ?>updateGrossPrices("products_group_p_price", "products_group_p_price_gross", taxRate);<?php
-       }
-
-       if ($group == GROUP_PRICE_PER_ITEM17) {
-                ?>updateGrossPrices("products_group_q_price", "products_group_q_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM18) {
-                ?>updateGrossPrices("products_group_r_price", "products_group_r_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM19) {
-                ?>updateGrossPrices("products_group_s_price", "products_group_s_price_gross", taxRate);<?php
-       }
-       if ($group == GROUP_PRICE_PER_ITEM20) {
-                ?>updateGrossPrices("products_group_t_price", "products_group_t_price_gross", taxRate);<?php
-       }
-     }
-  ?>
+  document.forms["new_product"].products_price_gross.value = doRound(grossValue, 4);
 }
 
 function updateNet() {
   var taxRate = getTaxRate();
+  var netValue = document.forms["new_product"].products_price_gross.value;
 
-  updateNetPrices("products_price_gross", "products_price", taxRate);
-  
-    <?php
-      foreach ($group_pricing_array as $group) {
-        if ($group == GROUP_PRICE_PER_ITEM1) {
-               ?>updateNetPrices("products_group_a_price_gross", "products_group_a_price", taxRate);<?php
-        }
-        if ($group == GROUP_PRICE_PER_ITEM2) {
-               ?>updateNetPrices("products_group_b_price_gross", "products_group_b_price", taxRate);<?php
-        }
-        if ($group == GROUP_PRICE_PER_ITEM3) {
-               ?>updateNetPrices("products_group_c_price_gross", "products_group_c_price", taxRate);<?php
-        }
-        if ($group == GROUP_PRICE_PER_ITEM4) {
-               ?>updateNetPrices("products_group_d_price_gross", "products_group_d_price", taxRate);<?php
-        }
+  if (taxRate > 0) {
+    netValue = netValue / ((taxRate / 100) + 1);
+  }
 
-        if ($group == GROUP_PRICE_PER_ITEM5) {
-               ?>updateNetPrices("products_group_e_price_gross", "products_group_e_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM6) {
-               ?>updateNetPrices("products_group_f_price_gross", "products_group_f_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM7) {
-               ?>updateNetPrices("products_group_g_price_gross", "products_group_g_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM8) {
-               ?>updateNetPrices("products_group_h_price_gross", "products_group_h_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM9) {
-               ?>updateNetPrices("products_group_i_price_gross", "products_group_i_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM10) {
-               ?>updateNetPrices("products_group_j_price_gross", "products_group_j_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM11) {
-               ?>updateNetPrices("products_group_k_price_gross", "products_group_k_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM12) {
-               ?>updateNetPrices("products_group_l_price_gross", "products_group_l_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM13) {
-               ?>updateNetPrices("products_group_m_price_gross", "products_group_m_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM14) {
-               ?>updateNetPrices("products_group_n_price_gross", "products_group_n_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM15) {
-               ?>updateNetPrices("products_group_o_price_gross", "products_group_o_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM16) {
-               ?>updateNetPrices("products_group_p_price_gross", "products_group_p_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM17) {
-               ?>updateNetPrices("products_group_q_price_gross", "products_group_q_price", taxRate);<?php
-        }
-        if ($group == GROUP_PRICE_PER_ITEM18) {
-               ?>updateNetPrices("products_group_r_price_gross", "products_group_r_price", taxRate);<?php
-        }
-
-        if ($group == GROUP_PRICE_PER_ITEM19) {
-               ?>updateNetPrices("products_group_s_price_gross", "products_group_s_price", taxRate);<?php
-        }       
-       
-        if ($group == GROUP_PRICE_PER_ITEM20) {
-               ?>updateNetPrices("products_group_t_price_gross", "products_group_t_price", taxRate);<?php
-        }
-
-      }   
-  ?>
+  document.forms["new_product"].products_price.value = doRound(netValue, 4);
 }
-
-function updateGrossPrices(field, field2, taxRate) {
-	
-   var grossValue = eval('document.forms["new_product"].' + field + '.value;');
-   if (taxRate > 0) {
-       grossValue = grossValue * ((taxRate / 100) + 1);
-   }
-
-   eval('document.forms["new_product"].' + field2 + '.value = doRound(grossValue, 4);');
-}
-
-function updateNetPrices(field, field2, taxRate) {
-
-   var netValue = eval('document.forms["new_product"].' + field + '.value;');
-    if (taxRate > 0) {
-       netValue = netValue / ((taxRate / 100) + 1);
-    }
-
-    eval('document.forms["new_product"].' + field2 + '.value = doRound(netValue, 4);');
-}
-
 //--></script>
     <?php
 //  echo $type_admin_handler;
@@ -498,14 +271,6 @@ echo zen_draw_hidden_field('products_price_sorter', $pInfo->products_price_sorte
             <td colspan="2" class="main" align="center"><?php echo (zen_get_categories_status($current_category_id) == '0' ? TEXT_CATEGORIES_STATUS_INFO_OFF : '') . ($out_status == true ? ' ' . TEXT_PRODUCTS_STATUS_INFO_OFF : ''); ?></td>
           <tr>
           <tr>
-            <td class="main"><?php echo TEXT_PRODUCTS_MODEL; ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_model', $pInfo->products_model, zen_set_field_length(TABLE_PRODUCTS, 'products_model')); ?></td>
-          </tr>
-          <tr>
-            <td class="main"><?php echo 'Products Type:'; ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_type', $pInfo->products_type, zen_set_field_length(TABLE_PRODUCTS, 'products_type')); ?></td>
-          </tr>
-          <tr>
             <td class="main"><?php echo TEXT_PRODUCTS_STATUS; ?></td>
             <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_radio_field('products_status', '1', $in_status) . '&nbsp;' . TEXT_PRODUCT_AVAILABLE . '&nbsp;' . zen_draw_radio_field('products_status', '0', $out_status) . '&nbsp;' . TEXT_PRODUCT_NOT_AVAILABLE; ?></td>
           </tr>
@@ -559,51 +324,8 @@ echo zen_draw_hidden_field('products_price_sorter', $pInfo->products_price_sorte
             <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
           </tr>
           <tr bgcolor="#ebebff">
-            <td class="main"><?php echo 'Item requires wiTECH system:'; ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_radio_field('require_witech_system', '1', ($pInfo->require_witech_system == 1)) . '&nbsp;' . 'Yes, an existing wiTECH system is required.' . '&nbsp;&nbsp;' . zen_draw_radio_field('require_witech_system', '0',  ($pInfo->require_witech_system == 0)) . '&nbsp;' . 'No.' . ' ' . ($pInfo->require_witech_system == 1 ? '<span class="errorText"></span>' : ''); ?></td>
-          </tr>
-          <tr bgcolor="#ebebff">
-            <td class="main"><?php echo 'Package as Accessory:'; ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_radio_field('package_as_accessory', '1', ($pInfo->package_as_accessory == 1)) . '&nbsp;' . 'Yes, package in the same box as other accessories.' . '&nbsp;&nbsp;' . zen_draw_radio_field('package_as_accessory', '0',  ($pInfo->package_as_accessory == 0)) . '&nbsp;' . 'No, package in a unique box.' . ' ' . ($pInfo->package_as_accessory == 1 ? '<span class="errorText"></span>' : ''); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package One - Length:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_one_length', $pInfo->package_one_length); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package One - Width:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_one_width', $pInfo->package_one_width); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package One - Height:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_one_height', $pInfo->package_one_height); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package Two - Length:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_two_length', $pInfo->package_two_length); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package Two - Width:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_two_width', $pInfo->package_two_width); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Package Two - Height:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('package_two_height', $pInfo->package_two_height); ?></td>
-          </tr>
-          <tr bgcolor="#ebebff">
-            <td class="main"><?php echo TEXT_PRODUCTS_WEIGHT; ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_weight', $pInfo->products_weight); ?></td>
-          </tr>
-          <tr>
-            <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-          </tr>
-          <tr bgcolor="#ebebff">
             <td class="main"><?php echo TEXT_PRODUCTS_TAX_CLASS; ?></td>
             <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_pull_down_menu('products_tax_class_id', $tax_class_array, $pInfo->products_tax_class_id, 'onchange="updateGross()"'); ?></td>
-          </tr>
-	      <tr bgcolor="#ebebff">
-            <td class="main"><?php echo "Declared Value:" ?></td>
-            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_declared_value', $pInfo->products_declared_value); ?></td>
           </tr>
           <tr bgcolor="#ebebff">
             <td class="main"><?php echo TEXT_PRODUCTS_PRICE_NET; ?></td>
@@ -613,313 +335,6 @@ echo zen_draw_hidden_field('products_price_sorter', $pInfo->products_price_sorte
             <td class="main"><?php echo TEXT_PRODUCTS_PRICE_GROSS; ?></td>
             <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_price_gross', $pInfo->products_price, 'OnKeyUp="updateNet()"'); ?></td>
           </tr>
-		  
-   		    <tr>
-            <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
-          </tr>
-         <?php
-           foreach ($group_pricing_array as $group) {
-              if ($group == GROUP_PRICE_PER_ITEM1) {
-               ?>
-                 <tr bgcolor="#ebebff">
-                   <td class="main"><?php echo TEXT_PRODUCTS_GROUP_A_PRICE_NET; ?></td>
-                   <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_a_price', $pInfo->products_group_a_price, 'onKeyUp="updateGross()"'); ?></td>
-                 </tr>
-                 <tr bgcolor="#ebebff">
-                   <td class="main"><?php echo TEXT_PRODUCTS_GROUP_A_PRICE_GROSS; ?></td>
-                   <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_a_price_gross', $pInfo->products_group_a_price, 'OnKeyUp="updateNet()"'); ?></td>
-                 </tr>
-               <?php
-              }
-             if ($group == GROUP_PRICE_PER_ITEM2) {
-                ?>
-                 <tr bgcolor="#ebebff">
-                   <td class="main"><?php echo TEXT_PRODUCTS_GROUP_B_PRICE_NET; ?></td>
-                   <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_b_price', $pInfo->products_group_b_price, 'onKeyUp="updateGross()"'); ?></td>
-                 </tr>
-                  <tr bgcolor="#ebebff">
-                   <td class="main"><?php echo TEXT_PRODUCTS_GROUP_B_PRICE_GROSS; ?></td>
-                   <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_b_price_gross', $pInfo->products_group_b_price, 'OnKeyUp="updateNet()"'); ?></td>
-                 </tr>
-               <?php
-             }
-             if ($group == GROUP_PRICE_PER_ITEM3) {
-                ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_C_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_c_price', $pInfo->products_group_c_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_C_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_c_price_gross', $pInfo->products_group_c_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-                <?php
-            }
-            if ($group == GROUP_PRICE_PER_ITEM4) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_D_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_d_price', $pInfo->products_group_d_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_D_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_d_price_gross', $pInfo->products_group_d_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-            if ($group == GROUP_PRICE_PER_ITEM5) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_E_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_e_price', $pInfo->products_group_e_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_E_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_e_price_gross', $pInfo->products_group_e_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM6) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_F_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_f_price', $pInfo->products_group_f_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_F_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_f_price_gross', $pInfo->products_group_f_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM7) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_G_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_g_price', $pInfo->products_group_g_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_G_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_g_price_gross', $pInfo->products_group_g_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM8) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_H_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_h_price', $pInfo->products_group_h_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_H_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_h_price_gross', $pInfo->products_group_h_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM9) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_I_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_i_price', $pInfo->products_group_i_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_I_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_i_price_gross', $pInfo->products_group_i_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM10) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_J_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_j_price', $pInfo->products_group_j_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_J_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_j_price_gross', $pInfo->products_group_j_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM11) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_K_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_k_price', $pInfo->products_group_k_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_K_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_k_price_gross', $pInfo->products_group_k_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM12) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_L_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_l_price', $pInfo->products_group_l_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_L_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_l_price_gross', $pInfo->products_group_l_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM13) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_M_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_m_price', $pInfo->products_group_m_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_M_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_m_price_gross', $pInfo->products_group_m_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM14) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_N_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_n_price', $pInfo->products_group_n_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_N_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_n_price_gross', $pInfo->products_group_n_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM15) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_O_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_o_price', $pInfo->products_group_o_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_O_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_o_price_gross', $pInfo->products_group_o_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM16) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_P_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_p_price', $pInfo->products_group_p_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_P_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_p_price_gross', $pInfo->products_group_p_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM17) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_Q_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_q_price', $pInfo->products_group_q_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_Q_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_q_price_gross', $pInfo->products_group_q_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM18) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_R_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_r_price', $pInfo->products_group_r_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_R_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_r_price_gross', $pInfo->products_group_r_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM19) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_S_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_s_price', $pInfo->products_group_s_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_S_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_s_price_gross', $pInfo->products_group_s_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-            if ($group == GROUP_PRICE_PER_ITEM20) {
-              ?>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_T_PRICE_NET; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_t_price', $pInfo->products_group_t_price, 'onKeyUp="updateGross()"'); ?></td>
-                  </tr>
-                  <tr bgcolor="#ebebff">
-                    <td class="main"><?php echo TEXT_PRODUCTS_GROUP_T_PRICE_GROSS; ?></td>
-                    <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . 
-zen_draw_input_field('products_group_t_price_gross', $pInfo->products_group_t_price, 'OnKeyUp="updateNet()"'); ?></td>
-                  </tr>
-              <?php
-           }
-
-      }
-     ?>
-
-		  
-		  
           <tr>
             <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
           </tr>
@@ -1014,6 +429,10 @@ updateGross();
             <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
           </tr>
           <tr>
+            <td class="main"><?php echo TEXT_PRODUCTS_MODEL; ?></td>
+            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_model', $pInfo->products_model, zen_set_field_length(TABLE_PRODUCTS, 'products_model')); ?></td>
+          </tr>
+          <tr>
             <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
           </tr>
 <?php
@@ -1068,6 +487,13 @@ updateGross();
 <?php
     }
 ?>
+          <tr>
+            <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
+          </tr>
+          <tr>
+            <td class="main"><?php echo TEXT_PRODUCTS_WEIGHT; ?></td>
+            <td class="main"><?php echo zen_draw_separator('pixel_trans.gif', '24', '15') . '&nbsp;' . zen_draw_input_field('products_weight', $pInfo->products_weight); ?></td>
+          </tr>
           <tr>
             <td colspan="2"><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
           </tr>

@@ -1,1 +1,0 @@
-Si necesita apoyo para ordenar, por favor comuníquese con la línea de apoyo witech al 888-948-3241, (888-witech1), desde México 001-881-948-3241 o desde España 001-888-948-3241.

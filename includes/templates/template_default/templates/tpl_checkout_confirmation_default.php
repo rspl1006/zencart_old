@@ -26,12 +26,7 @@
 <div class="buttonRow forward"><?php echo '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
 <?php } ?>
 
-<address><?php echo zen_address_format($order->billing['format_id'], $order->billing, 1, ' ', '<br />'); ?><br/><br/>
-<?php echo $order->billing['title'] ?><br/>
-<?php echo $order->billing['phone'] ?><br/>
-<?php echo $order->billing['email'] ?><br/>
-<?php echo $order->billing['tax_id'] ?><br/>
-</address>
+<address><?php echo zen_address_format($order->billing['format_id'], $order->billing, 1, ' ', '<br />'); ?></address>
 
 <?php
   $class =& $_SESSION['payment'];
@@ -72,12 +67,8 @@
 <h2 id="checkoutConfirmDefaultShippingAddress"><?php echo HEADING_DELIVERY_ADDRESS; ?></h2>
 <div class="buttonRow forward"><?php echo '<a href="' . $editShippingButtonLink . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
 
-<address><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, ' ', '<br />'); ?><br/><br/>
-<?php echo $order->delivery['title'] ?><br/>
-<?php echo $order->delivery['phone'] ?><br/>
-<?php echo $order->delivery['email'] ?><br/>
-<?php echo $order->delivery['tax_id'] ?><br/>
-</address>
+<address><?php echo zen_address_format($order->delivery['format_id'], $order->delivery, 1, ' ', '<br />'); ?></address>
+
 <?php
     if ($order->info['shipping_method']) {
 ?>
@@ -92,18 +83,18 @@
   }
 ?>
 <br class="clearBoth" />
+<hr />
 <?php
-   if(false){
+// always show comments
 //  if ($order->info['comments']) {
 ?>
 
-<hr />
 <h2 id="checkoutConfirmDefaultHeadingComments"><?php echo HEADING_ORDER_COMMENTS; ?></h2>
 <div class="buttonRow forward"><?php echo  '<a href="' . zen_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL') . '">' . zen_image_button(BUTTON_IMAGE_EDIT_SMALL, BUTTON_EDIT_SMALL_ALT) . '</a>'; ?></div>
 <div><?php echo (empty($order->info['comments']) ? NO_COMMENTS_TEXT : nl2br(zen_output_string_protected($order->info['comments'])) . zen_draw_hidden_field('comments', $order->info['comments'])); ?></div>
 <br class="clearBoth" />
 <?php
-  }
+//  }
 ?>
 <hr />
 
@@ -180,16 +171,12 @@
 ?>
 
 <?php
-  echo zen_draw_form('checkout_confirmation', $form_action_url, 'post', 'id="checkout_confirmation" onsubmit="if(!document.checkout_confirmation.termsNCondoitions.checked) {alert(\'Please accept terms and conditions.\');return false;} submitonce();"');
+  echo zen_draw_form('checkout_confirmation', $form_action_url, 'post', 'id="checkout_confirmation" onsubmit="submitonce();"');
 
   if (is_array($payment_modules->modules)) {
     echo $payment_modules->process_button();
   }
 ?>
-<hr>
-
-<input type="checkbox" name='termsNCondoitions' id='termsNCondoitions' /> <b>I Accept Terms and Conditions </b>
-<p style="margin-top:0px; font-weight:bold;"> Returns will be accepted only if product is returned UNOPENED and UNUSED within 30 days of customer receipt. The customer is responsible for return shipping costs. Original shipping costs cannot be refunded. The returned item refund will be processed to the customer's original form of payment less a 15% restocking fee. For all returns please contact us at 1-888-wiTECH-1 (1-888-948-3241) or at witechsupport@dcctools.com. ALL INTERNATIONAL CUSTOMERS ARE RESPONSIBLE FOR PAYING DUTIES AND TAXES WHEN THE SHIPMENT ARRIVES IN COUNTRY.</p>
 <div class="buttonRow forward"><?php echo zen_image_submit(BUTTON_IMAGE_CONFIRM_ORDER, BUTTON_CONFIRM_ORDER_ALT, 'name="btn_submit" id="btn_submit"') ;?></div>
 </form>
 <div class="buttonRow back"><?php echo TITLE_CONTINUE_CHECKOUT_PROCEDURE . '<br />' . TEXT_CONTINUE_CHECKOUT_PROCEDURE; ?></div>

@@ -1,9 +1,0 @@
-    Blue Sky Zencart template Made from the classic template folder form Zencart 1.36
-
-                           Created by Beasleybub 10/30/2006
-
-
-Very easy to install. Just add it to yout templates folder.
-Be sure to go into your admin and turn on/reset your sideboxes in your layout controller.
-
-Blue is one of my favorite colors so I thought I would spice zencart up a bit with a nice blue theme. I chanced some of the text sizes in the css file and the sidebox border colors.

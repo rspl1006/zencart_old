@@ -70,7 +70,7 @@ define('BUTTON_ADD_TO_CART_ALT', 'Add This to My Cart');
 define('BUTTON_ADD_ADDRESS_ALT', 'Add Address');
 define('BUTTON_ADD_PRODUCTS_TO_CART_ALT','Add Selected Products to Cart');
 define('BUTTON_BACK_ALT', 'Back');
-define('BUTTON_BUY_NOW_ALT', 'Add to Cart');
+define('BUTTON_BUY_NOW_ALT', 'Buy Now');
 define('BUTTON_CANCEL_ALT', 'Cancel');
 define('BUTTON_CHANGE_ADDRESS_ALT', 'Change Address');
 define('BUTTON_CHECKOUT_ALT', 'Checkout');

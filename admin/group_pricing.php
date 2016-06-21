@@ -115,10 +115,6 @@
         <td width="100%"><table border="0" width="100%" cellspacing="0" cellpadding="0">
           <tr>
             <td class="pageHeading"><?php echo HEADING_TITLE; ?></td>
-			
-          </tr>
-          <tr>
-            <td><?php echo GROUP_PRICE_PER_ITEM_ADMIN_NOTE; ?></td>
             <td class="pageHeading" align="right"><?php echo zen_draw_separator('pixel_trans.gif', HEADING_IMAGE_WIDTH, HEADING_IMAGE_HEIGHT); ?></td>
           </tr>
         </table></td>
@@ -153,16 +149,7 @@
 ?>
                 <td class="dataTableContent"><?php echo $groups->fields['group_id']; ?></td>
                 <td class="dataTableContent"><?php echo $groups->fields['group_name']; ?></td>
-                <td class="dataTableContent"><?php 
-                       if(in_array($groups->fields['group_name'], array(GROUP_PRICE_PER_ITEM1, GROUP_PRICE_PER_ITEM2, GROUP_PRICE_PER_ITEM3, GROUP_PRICE_PER_ITEM4,GROUP_PRICE_PER_ITEM5, GROUP_PRICE_PER_ITEM6, GROUP_PRICE_PER_ITEM7, GROUP_PRICE_PER_ITEM8,GROUP_PRICE_PER_ITEM9, GROUP_PRICE_PER_ITEM10,GROUP_PRICE_PER_ITEM11, GROUP_PRICE_PER_ITEM12, GROUP_PRICE_PER_ITEM13, GROUP_PRICE_PER_ITEM14,GROUP_PRICE_PER_ITEM15, GROUP_PRICE_PER_ITEM16, GROUP_PRICE_PER_ITEM17, GROUP_PRICE_PER_ITEM18,GROUP_PRICE_PER_ITEM19, GROUP_PRICE_PER_ITEM20))) {
-                           echo GROUP_PRICE_PER_ITEM_TEXT;
-                       } else {
-                           echo $groups->fields['group_percentage'];
-                       }
-                   ?>
-
-</td>
-
+                <td class="dataTableContent"><?php echo $groups->fields['group_percentage']; ?></td>
                 <td class="dataTableContent" align="right">
                   <?php echo '<a href="' . zen_href_link(FILENAME_GROUP_PRICING, 'page=' . $_GET['page'] . '&gID=' . $groups->fields['group_id'] . '&action=edit') . '">' . zen_image(DIR_WS_IMAGES . 'icon_edit.gif', ICON_EDIT) . '</a>'; ?>
                   <?php echo '<a href="' . zen_href_link(FILENAME_GROUP_PRICING, 'page=' . $_GET['page'] . '&gID=' . $groups->fields['group_id'] . '&action=delete') . '">' . zen_image(DIR_WS_IMAGES . 'icon_delete.gif', ICON_DELETE) . '</a>'; ?>

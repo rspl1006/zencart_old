@@ -24,7 +24,6 @@ if (!isset($flag_disable_footer) || !$flag_disable_footer) {
 ?>
 
 <!--bof-navigation display -->
-<!--
 <div id="navSuppWrapper">
 <div id="navSupp">
 <ul>
@@ -35,8 +34,6 @@ if (!isset($flag_disable_footer) || !$flag_disable_footer) {
 </ul>
 </div>
 </div>
--->
-<br/>
 <!--eof-navigation display -->
 
 <!--bof-ip address display -->
@@ -62,31 +59,8 @@ if (SHOW_FOOTER_IP == '1') {
 <!--eof-banner #5 display -->
 
 <!--bof- site copyright display -->
-<!-- 
-   <div id="siteinfoLegal" class="legalCopyright"><?php echo FOOTER_TEXT_BODY; ?></div>
--->
+<div id="siteinfoLegal" class="legalCopyright"><?php echo FOOTER_TEXT_BODY; ?></div>
 <!--eof- site copyright display -->
-
-	<div id="footer"
-		style='padding-top: 6px; color: white; height: 23px; background-color: #8994A2; width: 880px; font-size: 12px; font-family: Arial; font-style: normal;'>
-	<div
-		style=" text-align: left; float: left; margin-left: 10px;"></div>
-	<div
-		style="text-align: right; float: right; margin-right: 10px;">Copyright © 2009 Chrysler LLC. All rights reserved. | wiTECH is a registered trademark
-</div>
-	</div>
-	<table width=100%>
-		<tr>
-			<td><a href="http://www.dodge.com/en/" target="_blank"> <img
-				src="images/witech/dodge.gif" alt="" on /> </a></td>
-			<td><a href="http://www.chrysler.com/en/" target="_blank"> <img
-				src="images/witech/chrysler.gif" alt="" /></a></td>
-			<td><a href="http://www.jeep.com/en/" target="_blank"> <img
-				src="images/witech/jeep.gif" alt="" /> </a></td>
-			<td><a href="http://www.brightstareng.com/" target="_blank">
-			<img src="images/witech/brightstar.gif" alt="" /></a></td>
-		</tr>
-	</table>
 
 <?php
 } // flag_disable_footer
