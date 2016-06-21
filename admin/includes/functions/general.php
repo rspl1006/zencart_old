@@ -253,11 +253,24 @@
                                 and ptc.categories_id = '" . $current_category_id . "'
                                 order by products_name");
     } else {
-      $products = $db->Execute("select p.products_id, pd.products_name, p.products_price, p.products_model
+// DJS MOD 06/10/2009
+/*      $products = $db->Execute("select p.products_id, pd.products_name, p.products_price, p.products_model
                                 from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
                                 where p.products_id = pd.products_id
                                 and pd.language_id = '" . (int)$_SESSION['languages_id'] . "'
                                 order by products_name");
+*/
+      $products = $db->Execute("select p.products_id, pd.products_name, p.products_price,
+								p.products_group_a_price,
+								p.products_group_b_price,
+								p.products_group_c_price,
+								p.products_group_d_price,
+								p.products_model
+                                from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_DESCRIPTION . " pd
+                                where p.products_id = pd.products_id
+                                and pd.language_id = '" . (int)$_SESSION['languages_id'] . "'
+                                order by products_name");
+// END DJS MOD
     }
 
     while (!$products->EOF) {
@@ -265,7 +278,10 @@
         $display_price = zen_get_products_base_price($products->fields['products_id']);
         $select_string .= '<option value="' . $products->fields['products_id'] . '"';
         if ($set_selected == $products->fields['products_id']) $select_string .= ' SELECTED';
-        $select_string .= '>' . $products->fields['products_name'] . ' (' . $currencies->format($display_price) . ')' . ($show_model ? ' [' . $products->fields['products_model'] . '] ' : '') . ($show_id ? ' - ID# ' . $products->fields['products_id'] : '') . '</option>';
+// DJS MOD 06/10/2009
+//        $select_string .= '>' . $products->fields['products_name'] . ' (' . $currencies->format($display_price) . ')' . ($show_model ? ' [' . $products->fields['products_model'] . '] ' : '') . ($show_id ? ' - ID# ' . $products->fields['products_id'] : '') . '</option>';
+        $select_string .= '>' . $products->fields['products_name'] . ' (' . $currencies->format($display_price) . ', A: ' . $currencies->format($products->fields['products_group_a_price']) . ', B: ' . $currencies->format($products->fields['products_group_B_price']) . ', C: ' . $currencies->format($products->fields['products_group_c_price']) . ', D: ' . $currencies->format($products->fields['products_group_d_price']) . ')' . ($show_model ? ' [' . $products->fields['products_model'] . '] ' : '') . ($show_id ? ' - ID# ' . $products->fields['products_id'] : '') . '</option>';
+// END DJS MOD
       }
       $products->MoveNext();
     }
@@ -1301,12 +1317,15 @@
         $order->MoveNext();
       }
     }
-
-    $db->Execute("delete from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
-    $db->Execute("delete from " . TABLE_ORDERS_PRODUCTS . "
+	$db->Execute("DELETE FROM zen_orders_sub_line_item WHERE EXISTS (SELECT 'x' FROM zen_orders_products z WHERE z.orders_products_id = order_product_id AND z.orders_id = '" . (int)$order_id . "')");
+	
+	$db->Execute("DELETE FROM zen_orders_sub_line_item WHERE orders_total_id IN (SELECT t.orders_total_id FROM zen_orders_total t WHERE t.orders_id = '" . (int)$order_id . "')");
+	
+  
+    $db->Execute("delete from " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
                   where orders_id = '" . (int)$order_id . "'");
 
-    $db->Execute("delete from " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . "
+    $db->Execute("delete from " . TABLE_ORDERS_PRODUCTS . "
                   where orders_id = '" . (int)$order_id . "'");
 
     $db->Execute("delete from " . TABLE_ORDERS_STATUS_HISTORY . "
@@ -1315,6 +1334,8 @@
     $db->Execute("delete from " . TABLE_ORDERS_TOTAL . "
                   where orders_id = '" . (int)$order_id . "'");
 
+    $db->Execute("delete from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "'");
+  			   
   }
 
   function zen_get_file_permissions($mode) {
@@ -2980,7 +3001,7 @@ function zen_copy_products_attributes($products_id_from, $products_id_to) {
 
 ////
 // compute the days between two dates
-  function date_diff($date1, $date2) {
+ /* function date_diff($date1, $date2) {
   //$date1  today, or any other day
   //$date2  date to check against
 
@@ -2998,7 +3019,7 @@ function zen_copy_products_attributes($products_id_from, $products_id_to) {
     $date2_set = mktime(0,0,0, $m2, $d2, $y2);
 
     return(round(($date2_set-$date1_set)/(60*60*24)));
-  }
+  }*/
 
 ////
 // check that a download filename exists

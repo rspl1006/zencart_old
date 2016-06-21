@@ -1455,7 +1455,8 @@ if (!defined('IS_ADMIN_FLAG')) {
 
 ////
 // compute the days between two dates
-  function date_diff($date1, $date2) {
+ /* 
+function date_diff($date1, $date2) {
   //$date1  today, or any other day
   //$date2  date to check against
 
@@ -1474,7 +1475,7 @@ if (!defined('IS_ADMIN_FLAG')) {
 
     return(round(($date2_set-$date1_set)/(60*60*24)));
   }
-
+*/
 
 /**
  * strip out accented characters to reasonable approximations of english equivalents

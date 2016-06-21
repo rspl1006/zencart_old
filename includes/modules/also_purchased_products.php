@@ -11,7 +11,7 @@
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
 }
-if (isset($_GET['products_id']) && SHOW_PRODUCT_INFO_COLUMNS_ALSO_PURCHASED_PRODUCTS > 0 && MIN_DISPLAY_ALSO_PURCHASED > 0) {
+if (isset($_GET['products_id']) && SHOW_PRODUCT_INFO_COLUMNS_ALSO_PURCHASED_PRODUCTS < 0 && MIN_DISPLAY_ALSO_PURCHASED > 0) {
 
   $also_purchased_products = $db->Execute(sprintf(SQL_ALSO_PURCHASED, (int)$_GET['products_id'], (int)$_GET['products_id']));
 

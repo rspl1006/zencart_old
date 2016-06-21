@@ -77,7 +77,9 @@
   if ($product['buttonUpdate'] == '') {
     echo '' ;
   } else {
-    echo $product['buttonUpdate'];
+   echo $product['buttonUpdate'];
+//    echo '' ;
+   // echo '<a href="javascript:void(0)" onClick="document.cart_quantity.submit()">' .zen_image_button(ICON_IMAGE_UPDATE, ICON_UPDATE_ALT). '</a>';
   }
 ?>
        </td>
@@ -135,7 +137,7 @@
 // show update cart button
   if (SHOW_SHOPPING_CART_UPDATE == 2 or SHOW_SHOPPING_CART_UPDATE == 3) {
 ?>
-<div class="buttonRow back"><?php echo zen_image_submit(ICON_IMAGE_UPDATE, ICON_UPDATE_ALT); ?></div>
+<div class="buttonRow back"><?php echo '<span onClick="document.cart_quantity.submit();">' .zen_image_button(ICON_IMAGE_UPDATE, ICON_UPDATE_ALT). '</span>'; ?></div>
 <?php
   } else { // don't show update button below cart
 ?>

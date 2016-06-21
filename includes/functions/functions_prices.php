@@ -13,7 +13,23 @@
 //get specials price or sale price
   function zen_get_products_special_price($product_id, $specials_price_only=false) {
     global $db;
-    $product = $db->Execute("select products_price, products_model, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$product_id . "'");
+
+// DJS MOD 06/10/2009
+     if($_SESSION['customer_id']) {
+       $customer_group_query = "select gp.group_name
+                                 from " . TABLE_CUSTOMERS . " cu
+                                 left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                                 where cu.customers_id = " . $_SESSION['customer_id'];
+        if($customer_group = $db->Execute($customer_group_query)) {
+          $customers_group=$customer_group->fields['group_name'];
+        }
+     }
+
+    //$product = $db->Execute("select products_price, products_model, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$product_id . "'");
+    $product = $db->Execute("select products_price, products_group_a_price, products_group_b_price, products_group_c_price, products_group_d_price, products_group_e_price, products_group_f_price, products_group_g_price, products_group_h_price, products_group_i_price, products_group_j_price, products_group_k_price, products_group_l_price, products_group_m_price, products_group_n_price, products_group_o_price, products_group_p_price, products_group_q_price, products_group_r_price, products_group_s_price, products_group_t_price, products_model, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$product_id . "'");
+
+
+// end MOD
 
     if ($product->RecordCount() > 0) {
 //  	  $product_price = $product->fields['products_price'];
@@ -22,10 +38,26 @@
   	  return false;
     }
 
-    $specials = $db->Execute("select specials_new_products_price from " . TABLE_SPECIALS . " where products_id = '" . (int)$product_id . "' and status='1'");
+// DJS MOD 06/10/2009
+//    $specials = $db->Execute("select specials_new_products_price from " . TABLE_SPECIALS . " where products_id = '" . (int)$product_id . "' and status='1'");
+    $specials = $db->Execute("select specials_new_products_price, specials_new_products_group_a_price, specials_new_products_group_b_price, specials_new_products_group_c_price, specials_new_products_group_d_price from " . TABLE_SPECIALS . " where products_id = '" . (int)$product_id . "' and status='1'");
+// end MOD
     if ($specials->RecordCount() > 0) {
 //      if ($product->fields['products_priced_by_attribute'] == 1) {
     	  $special_price = $specials->fields['specials_new_products_price'];
+// DJS MOD 06/10/2009
+		if($customers_group) {
+			if($customers_group == GROUP_PRICE_PER_ITEM1 && $specials->fields['specials_new_products_group_a_price'] != 0) {
+			$special_price = $specials->fields['specials_new_products_group_a_price'];
+			} elseif($customers_group == GROUP_PRICE_PER_ITEM2 && $specials->fields['specials_new_products_group_b_price'] != 0) {
+			$special_price = $specials->fields['specials_new_products_group_b_price'];
+			} elseif($customers_group == GROUP_PRICE_PER_ITEM3 && $specials->fields['specials_new_products_group_c_price'] != 0) {
+			$special_price = $specials->fields['specials_new_products_group_c_price'];
+			} elseif($customers_group == GROUP_PRICE_PER_ITEM4 && $specials->fields['specials_new_products_group_d_price'] != 0) {
+			$special_price = $specials->fields['specials_new_products_group_d_price'];
+			}
+		}
+// end MOD
     } else {
   	  $special_price = false;
     }
@@ -115,11 +147,64 @@
 // computes products_price + option groups lowest attributes price of each group when on
   function zen_get_products_base_price($products_id) {
     global $db;
-      $product_check = $db->Execute("select products_price, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$products_id . "'");
+
+     if($_SESSION['customer_id']) {
+       $customer_group_query = "select gp.group_name
+                                 from " . TABLE_CUSTOMERS . " cu
+                                 left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                                 where cu.customers_id = " . $_SESSION['customer_id'];
+        if($customer_group = $db->Execute($customer_group_query)) {
+          $customers_group=$customer_group->fields['group_name'];
+        }
+     }
+
+     $product_check = $db->Execute("select products_price,  products_group_a_price, products_group_b_price, products_group_c_price, products_group_d_price, products_group_e_price, products_group_f_price, products_group_g_price, products_group_h_price, products_group_i_price, products_group_j_price, products_group_k_price, products_group_l_price, products_group_m_price, products_group_n_price, products_group_o_price, products_group_p_price, products_group_q_price, products_group_r_price, products_group_s_price, products_group_t_price, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$products_id . "'");
 
 // is there a products_price to add to attributes
-      $products_price = $product_check->fields['products_price'];
-
+		  $products_price = $product_check->fields['products_price'];
+      if($customers_group) {
+        if($customers_group == GROUP_PRICE_PER_ITEM1 && $product_check->fields['products_group_a_price'] != 0) {
+          $products_price = $product_check->fields['products_group_a_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM2 && $product_check->fields['products_group_b_price'] != 0) {
+          $products_price = $product_check->fields['products_group_b_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM3 && $product_check->fields['products_group_c_price'] != 0) {
+          $products_price = $product_check->fields['products_group_c_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM4 && $product_check->fields['products_group_d_price'] != 0) {
+          $products_price = $product_check->fields['products_group_d_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM5 && $product_check->fields['products_group_e_price'] != 0) {
+          $products_price = $product_check->fields['products_group_e_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM6 && $product_check->fields['products_group_f_price'] != 0) {
+          $products_price = $product_check->fields['products_group_f_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM7 && $product_check->fields['products_group_g_price'] != 0) {
+          $products_price = $product_check->fields['products_group_g_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM8 && $product_check->fields['products_group_h_price'] != 0) {
+          $products_price = $product_check->fields['products_group_h_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM9 && $product_check->fields['products_group_i_price'] != 0) {
+          $products_price = $product_check->fields['products_group_i_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM10 && $product_check->fields['products_group_j_price'] != 0) {
+          $products_price = $product_check->fields['products_group_j_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM11 && $product_check->fields['products_group_k_price'] != 0) {
+          $products_price = $product_check->fields['products_group_k_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM12 && $product_check->fields['products_group_l_price'] != 0) {
+          $products_price = $product_check->fields['products_group_l_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM13 && $product_check->fields['products_group_m_price'] != 0) {
+          $products_price = $product_check->fields['products_group_m_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM14 && $product_check->fields['products_group_n_price'] != 0) {
+          $products_price = $product_check->fields['products_group_n_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM15 && $product_check->fields['products_group_o_price'] != 0) {
+          $products_price = $product_check->fields['products_group_o_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM16 && $product_check->fields['products_group_p_price'] != 0) {
+          $products_price = $product_check->fields['products_group_p_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM17 && $product_check->fields['products_group_q_price'] != 0) {
+          $products_price = $product_check->fields['products_group_q_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM18 && $product_check->fields['products_group_r_price'] != 0) {
+          $products_price = $product_check->fields['products_group_r_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM19 && $product_check->fields['products_group_s_price'] != 0) {
+          $products_price = $product_check->fields['products_group_s_price'];
+        } elseif($customers_group == GROUP_PRICE_PER_ITEM20 && $product_check->fields['products_group_t_price'] != 0) {
+          $products_price = $product_check->fields['products_group_t_price'];
+        }
+      }
       // do not select display only attributes and attributes_price_base_included is true
       $product_att_query = $db->Execute("select options_id, price_prefix, options_values_price, attributes_display_only, attributes_price_base_included from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$products_id . "' and attributes_display_only != '1' and attributes_price_base_included='1'". " order by options_id, price_prefix, options_values_price");
 
@@ -138,6 +223,78 @@
         $the_base_price = $products_price + $the_base_price;
       } else {
         $the_base_price = $products_price;
+      }
+      return $the_base_price;
+  }
+
+
+////
+// computes products_price + option groups lowest attributes price of each group when on
+  function zen_get_products_retail_base_price($products_id) {
+    global $db;
+
+     if($_SESSION['customer_id']) {
+       $customer_group_query = "select gp.group_name
+                                 from " . TABLE_CUSTOMERS . " cu
+                                 left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                                 where cu.customers_id = " . $_SESSION['customer_id'];
+        if($customer_group = $db->Execute($customer_group_query)) {
+          $customers_group=$customer_group->fields['group_name'];
+        }
+     }
+
+     $product_check = $db->Execute("select products_price,  products_group_a_price, products_group_b_price, products_group_c_price, products_group_d_price, products_group_e_price, products_group_f_price, products_group_g_price, products_group_h_price, products_group_i_price, products_group_j_price, products_group_k_price, products_group_l_price, products_group_m_price, products_group_n_price, products_group_o_price, products_group_p_price, products_group_q_price, products_group_r_price, products_group_s_price, products_group_t_price, products_priced_by_attribute from " . TABLE_PRODUCTS . " where products_id = '" . (int)$products_id . "'");
+
+		$the_base_price= 0;
+
+      if($customers_group) {
+		// If the item has a group price specified for the current customer's group,
+		// the group price will be displayed.
+		// The retail product_price will likely be different than the group price,
+		// so retrieve the retail product_price, then add attribute prices to it,
+		// and display it below the group price.
+        if( $customers_group == GROUP_PRICE_PER_ITEM1 && $product_check->fields['products_group_a_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM2 && $product_check->fields['products_group_b_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM3 && $product_check->fields['products_group_c_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM4 && $product_check->fields['products_group_d_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM5 && $product_check->fields['products_group_e_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM6 && $product_check->fields['products_group_f_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM7 && $product_check->fields['products_group_g_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM8 && $product_check->fields['products_group_h_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM9 && $product_check->fields['products_group_i_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM10 && $product_check->fields['products_group_j_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM11 && $product_check->fields['products_group_k_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM12 && $product_check->fields['products_group_l_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM13 && $product_check->fields['products_group_m_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM14 && $product_check->fields['products_group_n_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM15 && $product_check->fields['products_group_o_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM16 && $product_check->fields['products_group_p_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM17 && $product_check->fields['products_group_q_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM18 && $product_check->fields['products_group_r_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM19 && $product_check->fields['products_group_s_price'] != 0 or
+			$customers_group == GROUP_PRICE_PER_ITEM20 && $product_check->fields['products_group_t_price'] != 0 ) {
+          $products_price = $product_check->fields['products_price'];
+
+		  // do not select display only attributes and attributes_price_base_included is true
+		  $product_att_query = $db->Execute("select options_id, price_prefix, options_values_price, attributes_display_only, attributes_price_base_included from " . TABLE_PRODUCTS_ATTRIBUTES . " where products_id = '" . (int)$products_id . "' and attributes_display_only != '1' and attributes_price_base_included='1'". " order by options_id, price_prefix, options_values_price");
+
+		  $the_options_id= 'x';
+	// add attributes price to retail price
+		  if ($product_check->fields['products_priced_by_attribute'] == '1' and $product_att_query->RecordCount() >= 1) {
+			while (!$product_att_query->EOF) {
+			  if ( $the_options_id != $product_att_query->fields['options_id']) {
+				$the_options_id = $product_att_query->fields['options_id'];
+				$the_base_price += $product_att_query->fields['options_values_price'];
+			  }
+			  $product_att_query->MoveNext();
+			}
+
+			$the_base_price = $products_price + $the_base_price;
+		  } else {
+			$the_base_price = $products_price;
+		  }
+
+        }
       }
       return $the_base_price;
   }
@@ -189,6 +346,15 @@
       }
     }
 
+    if($_SESSION['customer_id']) {
+      $customer_group_query = "select gp.group_name
+                                from " . TABLE_CUSTOMERS . " cu
+                                left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                               where cu.customers_id = " . $_SESSION['customer_id'];
+      if($customer_group = $db->Execute($customer_group_query)) {
+        $customers_group=$customer_group->fields['group_name'];
+      }
+    }
     // $new_fields = ', product_is_free, product_is_call, product_is_showroom_only';
     $product_check = $db->Execute("select products_tax_class_id, products_price, products_priced_by_attribute, product_is_free, product_is_call, products_type from " . TABLE_PRODUCTS . " where products_id = '" . (int)$products_id . "'" . " limit 1");
 
@@ -284,6 +450,56 @@
     }
 
     return $final_display_price . $free_tag . $call_tag;
+  }
+
+////
+// Display Price Retail
+// Specials and Tax Included
+  function zen_get_products_retail_display_price($products_id) {
+    global $db, $currencies;
+
+
+// 0 = normal shopping
+// 1 = Login to shop
+// 2 = Can browse but no prices
+    // verify display of prices
+      switch (true) {
+        case (CUSTOMERS_APPROVAL == '1' and $_SESSION['customer_id'] == ''):
+        // customer must be logged in to browse
+        case (CUSTOMERS_APPROVAL == '2' and $_SESSION['customer_id'] == ''):
+        // customer may browse but no prices
+        case (CUSTOMERS_APPROVAL == '3' and TEXT_LOGIN_FOR_PRICE_PRICE_SHOWROOM != ''):
+        // customer may browse but no prices
+        case ((CUSTOMERS_APPROVAL_AUTHORIZATION != '0' and CUSTOMERS_APPROVAL_AUTHORIZATION != '3') and $_SESSION['customer_id'] == ''):
+        // customer must be logged in to browse
+        case ((CUSTOMERS_APPROVAL_AUTHORIZATION != '0' and CUSTOMERS_APPROVAL_AUTHORIZATION != '3') and $_SESSION['customers_authorization'] > '0'):
+        // customer must be logged in to browse
+        return '';
+        break;
+        default:
+        // proceed normally
+        break;
+      }
+
+// show case only
+    if (STORE_STATUS != '0') {
+      if (STORE_STATUS == '1') {
+        return '';
+      }
+    }
+
+
+    // no prices on Document General
+    if ($product_check->fields['products_type'] == 3) {
+      return '';
+    }
+
+    $display_retail_price = zen_get_products_retail_base_price($products_id);
+	if ($display_retail_price) $display_retail_price = '<span id="retailPrice">' .  RETAIL_PRICE_PREFIX_TEXT . $currencies->display_price($display_retail_price, zen_get_tax_rate($product_check->fields['products_tax_class_id'])) . RETAIL_PRICE_SUFFIX_TEXT . '</span>';
+	else $display_retail_price = '';
+
+
+    return $display_retail_price;
   }
 
 ////
@@ -1043,7 +1259,11 @@ If a special exist * 10
 ////
 // return attributes_qty_prices or attributes_qty_prices_onetime based on qty
   function zen_get_attributes_qty_prices_onetime($string, $qty) {
-    $attribute_qty = split("[:,]" , $string);
+     $attribute_qty = split("[:,]" , $string);
+
+
+
+
     $new_price = 0;
     $size = sizeof($attribute_qty);
 // if an empty string is passed then $attributes_qty will consist of a 1 element array
@@ -1067,8 +1287,9 @@ If a special exist * 10
 // $check_for=50;
       $attribute_table_cost = split("[:,]" , $check_what);
       $size = sizeof($attribute_table_cost);
+
       for ($i=0, $n=$size; $i<$n; $i+=2) {
-        if ($check_for >= $attribute_table_cost[$i]) {
+	        if ($check_for >= $attribute_table_cost[$i]) {
           $attribute_quantity_check = $attribute_table_cost[$i];
           $attribute_quantity_price = $attribute_table_cost[$i+1];
         }
@@ -1143,7 +1364,7 @@ If a special exist * 10
     $display_special_price = zen_get_products_special_price($pre_selected_onetime->fields["products_id"]);
 
     // price factor one time
-      $attributes_price_final_onetime += zen_get_attributes_price_factor($display_normal_price, $display_special_price, $pre_selected_onetime->fields["attributes_price_factor_onetime"], $pre_selected_onetime->fields["attributes_price_factor_onetime_offset"]);
+     $attributes_price_final_onetime += zen_get_attributes_price_factor($display_normal_price, $display_special_price, $pre_selected_onetime->fields["attributes_price_factor_onetime"], $pre_selected_onetime->fields["attributes_price_factor_onetime_offset"]);
 
     // onetime charge qty price
       $attributes_price_final_onetime += zen_get_attributes_qty_prices_onetime($pre_selected_onetime->fields["attributes_qty_prices_onetime"], 1);
@@ -1182,7 +1403,6 @@ If a special exist * 10
 ////
 // calculate words price
   function zen_get_word_count_price($string, $free=0, $price) {
-
     $word_count = zen_get_word_count($string, $free);
     if ($word_count >= 1) {
       return ($word_count * $price);
@@ -1215,13 +1435,12 @@ If a special exist * 10
 ////
 // calculate letters price
   function zen_get_letters_count_price($string, $free=0, $price) {
-
-    $letters_price = zen_get_letters_count($string, $free) * $price;
-    if ($letters_price <= 0) {
-      return 0;
-    } else {
-      return $letters_price;
-    }
+      $letters_price = zen_get_letters_count($string, $free) * $price;
+      if ($letters_price <= 0) {
+        return 0;
+      } else {
+        return $letters_price;
+      }
   }
 
 
@@ -1267,7 +1486,7 @@ If a special exist * 10
               if ($check_amount != 0) {
                 $discounted_price = $check_amount - ($check_amount * ($products_discounts_query->fields['discount_price']/100));
               } else {
-                $discounted_price = $display_price - ($display_price * ($products_discounts_query->fields['discount_price']/100));
+               $discounted_price = $display_price - ($display_price * ($products_discounts_query->fields['discount_price']/100));
               }
             } else {
               $discounted_price = $display_specials_price - ($display_specials_price * ($products_discounts_query->fields['discount_price']/100));
@@ -1279,9 +1498,9 @@ If a special exist * 10
         case '2':
           if ($products_query->fields['products_discount_type_from'] == '0') {
             $discounted_price = $products_discounts_query->fields['discount_price'];
-          } else {
-            $discounted_price = $products_discounts_query->fields['discount_price'];
-          }
+          }// else {
+            //$discounted_price = $products_discounts_query->fields['discount_price'];
+         // }
           break;
         // amount offprice
         case '3':
@@ -1325,7 +1544,7 @@ If a special exist * 10
     $products_price_sorter = zen_get_products_actual_price($product_id);
 
     $db->Execute("update " . TABLE_PRODUCTS . " set
-                  products_price_sorter='" . zen_db_prepare_input($products_price_sorter) . "'
+         products_price_sorter='" . zen_db_prepare_input($products_price_sorter) . "'
                   where products_id='" . (int)$product_id . "'");
   }
 

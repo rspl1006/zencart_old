@@ -1,24 +1,11 @@
 <?php
-//
-// +----------------------------------------------------------------------+
-// |zen-cart Open Source E-commerce                                       |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 2004 The zen-cart developers                           |
-// |                                                                      |
-// | http://www.zen-cart.com/index.php                                    |
-// |                                                                      |
-// | Portions Copyright (c) 2003 osCommerce                               |
-// +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the GPL license,       |
-// | that is bundled with this package in the file LICENSE, and is        |
-// | available through the world-wide-web at the following url:           |
-// | http://www.zen-cart.com/license/2_0.txt.                             |
-// | If you did not receive a copy of the zen-cart license and are unable |
-// | to obtain it through the world-wide-web, please send a note to       |
-// | license@zen-cart.com so we can mail you a copy immediately.          |
-// +----------------------------------------------------------------------+
-//  $Id: document_product.php 2830 2006-01-10 17:13:18Z birdbrain $
-//
+/**
+ * @package admin
+ * @copyright Copyright 2003-2008 Zen Cart Development Team
+ * @copyright Portions Copyright 2003 osCommerce
+ * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
+ * @version $Id: english.php 7440 2007-11-17 21:51:35Z drbyte $
+ */
 
 define('HEADING_TITLE', 'Categories / Products');
 define('HEADING_TITLE_GOTO', 'Go To:');
@@ -110,6 +97,46 @@ define('TEXT_PRODUCTS_URL_WITHOUT_HTTP', '<small>(without http://)</small>');
 define('TEXT_PRODUCTS_PRICE_NET', 'Products Price (Net):');
 define('TEXT_PRODUCTS_PRICE_GROSS', 'Products Price (Gross):');
 define('TEXT_PRODUCTS_WEIGHT', 'Products Shipping Weight:');
+define('TEXT_PRODUCTS_GROUP_A_PRICE_NET',   GROUP_PRICE_PER_ITEM1 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_A_PRICE_GROSS', GROUP_PRICE_PER_ITEM1 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_B_PRICE_NET',   GROUP_PRICE_PER_ITEM2 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_B_PRICE_GROSS', GROUP_PRICE_PER_ITEM2 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_C_PRICE_NET',   GROUP_PRICE_PER_ITEM3 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_C_PRICE_GROSS', GROUP_PRICE_PER_ITEM3 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_D_PRICE_NET',   GROUP_PRICE_PER_ITEM4 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_D_PRICE_GROSS', GROUP_PRICE_PER_ITEM4 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_E_PRICE_NET',   GROUP_PRICE_PER_ITEM5 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_E_PRICE_GROSS', GROUP_PRICE_PER_ITEM5 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_F_PRICE_NET',   GROUP_PRICE_PER_ITEM6 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_F_PRICE_GROSS', GROUP_PRICE_PER_ITEM6 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_G_PRICE_NET',   GROUP_PRICE_PER_ITEM7 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_G_PRICE_GROSS', GROUP_PRICE_PER_ITEM7 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_H_PRICE_NET',   GROUP_PRICE_PER_ITEM8 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_H_PRICE_GROSS', GROUP_PRICE_PER_ITEM8 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_I_PRICE_NET',   GROUP_PRICE_PER_ITEM9 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_I_PRICE_GROSS', GROUP_PRICE_PER_ITEM9 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_J_PRICE_NET',   GROUP_PRICE_PER_ITEM10 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_J_PRICE_GROSS', GROUP_PRICE_PER_ITEM10 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_K_PRICE_NET',   GROUP_PRICE_PER_ITEM11 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_K_PRICE_GROSS', GROUP_PRICE_PER_ITEM11 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_L_PRICE_NET',   GROUP_PRICE_PER_ITEM12 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_L_PRICE_GROSS', GROUP_PRICE_PER_ITEM12 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_M_PRICE_NET',   GROUP_PRICE_PER_ITEM13 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_M_PRICE_GROSS', GROUP_PRICE_PER_ITEM13 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_N_PRICE_NET',   GROUP_PRICE_PER_ITEM14 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_N_PRICE_GROSS', GROUP_PRICE_PER_ITEM14 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_O_PRICE_NET',   GROUP_PRICE_PER_ITEM15 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_O_PRICE_GROSS', GROUP_PRICE_PER_ITEM15 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_P_PRICE_NET',   GROUP_PRICE_PER_ITEM16 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_P_PRICE_GROSS', GROUP_PRICE_PER_ITEM16 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_Q_PRICE_NET',   GROUP_PRICE_PER_ITEM17 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_Q_PRICE_GROSS', GROUP_PRICE_PER_ITEM17 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_R_PRICE_NET',   GROUP_PRICE_PER_ITEM18 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_R_PRICE_GROSS', GROUP_PRICE_PER_ITEM18 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_S_PRICE_NET',   GROUP_PRICE_PER_ITEM19 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_S_PRICE_GROSS', GROUP_PRICE_PER_ITEM19 . ' Price (Gross):');
+define('TEXT_PRODUCTS_GROUP_T_PRICE_NET',   GROUP_PRICE_PER_ITEM20 . ' Price (Net):');
+define('TEXT_PRODUCTS_GROUP_T_PRICE_GROSS', GROUP_PRICE_PER_ITEM20 . ' Price (Gross):');
 
 define('EMPTY_CATEGORY', 'Empty Category');
 
@@ -133,7 +160,7 @@ define('TEXT_COPY_AS_DUPLICATE', 'Duplicate product');
   define('TEXT_INFO_ATTRIBUTES_FEATURES_COPY_TO_PRODUCT','Copy Attributes to another <strong>product</strong> from:<br />');
   define('TEXT_INFO_ATTRIBUTES_FEATURES_COPY_TO_CATEGORY','Copy Attributes to another <strong>category</strong> from:<br />');
 
-  define('TEXT_COPY_ATTRIBUTES_CONDITIONS','<strong>How should existing product attributes should be handled?</strong>');
+  define('TEXT_COPY_ATTRIBUTES_CONDITIONS','<strong>How should existing product attributes be handled?</strong>');
   define('TEXT_COPY_ATTRIBUTES_DELETE','<strong>Delete</strong> first, then copy new attributes');
   define('TEXT_COPY_ATTRIBUTES_UPDATE','<strong>Update</strong> with new settings/prices, then add new ones');
   define('TEXT_COPY_ATTRIBUTES_IGNORE','<strong>Ignore</strong> and add only new attributes');

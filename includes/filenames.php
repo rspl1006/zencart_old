@@ -16,7 +16,7 @@
 define('FILENAME_ACCOUNT', 'account');
 define('FILENAME_ACCOUNT_EDIT', 'account_edit');
 define('FILENAME_ACCOUNT_HISTORY', 'account_history');
-define('FILENAME_ACCOUNT_HISTORY_INFO', 'account_history_info');
+define('FILENAME_ACCOUNT_HISTORY_INFO', 'tracker');
 define('FILENAME_ACCOUNT_NEWSLETTERS', 'account_newsletters');
 define('FILENAME_ACCOUNT_NOTIFICATIONS', 'account_notifications');
 define('FILENAME_ACCOUNT_PASSWORD', 'account_password');
@@ -95,7 +95,7 @@ define('FILENAME_MAIN_PRODUCT_IMAGE', 'main_product_image');
 define('FILENAME_MANUFACTURERS', 'manufacturers');
 define('FILENAME_MODULES', 'modules');
 define('FILENAME_NEWSLETTERS', 'newsletters');
-define('FILENAME_ORDERS', 'orders');
+define('FILENAME_ORDERS', 'tracker');
 define('FILENAME_ORDERS_INVOICE', 'invoice');
 define('FILENAME_ORDERS_PACKINGSLIP', 'packingslip');
 define('FILENAME_ORDERS_STATUS', 'orders_status');
