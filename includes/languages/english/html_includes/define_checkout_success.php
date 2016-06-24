@@ -1,2 +1,1 @@
-<p><strong>Checkout Success Sample Text ...</strong></p><p>A few words about the approximate shipping time or your processing policy would be put here. </p>
-<p>This section of text is from the Define Pages Editor located under Tools in the Admin.</p>
+<p><strong>Thank you for your purchase, your order will be processed and you will be informed via email when your order is billed and shipped. If you believe that an error has occurred please contact us at 888-witech-1 (888-948-3241) </strong></p>

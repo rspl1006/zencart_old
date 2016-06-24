@@ -1,47 +1,128 @@
-Zen Cart(tm) - The Art of E-Commerce
-Welcome to Zen Cart(tm) E-Commerce
-Version 1.3.8
+//----------------------------------------------------------------------------------------
+//--- Additional customers fields MOD v3.01 ----------------------------------------------
+//----------------------------------------------------------------------------------------
+// --- Coded by TheOracle on May 22 2008. ------------------------------------------------
+// --- Support: http://www.zen-cart.com/forum --------------------------------------------
+// --- Designed for Zen-Cart v1.3x versions ----------------------------------------------
+//----------------------------------------------------------------------------------------
+// If you like this MOD, please send a donation to: scoutch@gmail.com . ------------------
+//----------------------------------------------------------------------------------------
 
-THE FOLLOWING IS A VERY SIMPLIFIED INSTALLATION DOCUMENT.
-WE SUGGEST YOU USE THE HTML VERSIONS IN THE /docs FOLDER FOR MORE DETAILED INSTRUCTIONS.
+// Side note: THIS ENTIRE DOCUMENTATION IS A 'MUST READ' !
 
-ALL OF OUR README DOCUMENTS ARE IN THE /docs FOLDER OF THIS DISTRIBUTION.
+// Introduction
 
+The additional customers fields MOD allows you to create, delete, activate/de-activate your created fields - 
+on wizard basis with simply one or two clicks.
 
-You can find online documentation at: http://tutorials.zen-cart.com
+So far, Zen-Cart will be the most recognized (if not uniquely) for this type of easy functionality. As it may have noticed already,
+several thousands of users were waiting for this moment to come. The cure has finally been discovered !
 
+// *** May 22 2008 ***
 
-Zen Cart has a built-in automatic installation system. However to use this you must first unpack
-the code to a web server.
+Read more on the changelog.txt file regarding the new features that has been recently added within this contribution (since v3.0 release).
 
-The web server can either be on your local computer or on an internet host.
+// *** End of update May 22 2008 ***
 
-To start off, you should have to extract the Zen Cart(tm) ZIP file. How you do this depends on the operating system you use.
+// Features
 
-Once extracted, you will have a directory containing the Zen Cart(tm) scripts.
+- No more technical knowledge for adding additional customers fields into the TABLE_CUSTOMERS table.
+- Universal languages compatible.
 
-The contents of this directory needs to be moved to your webserver, either by copying the directory or
-by using an FTP progam.
+- Admin/customers.php file now supports PHP array grouped table names
+  (see: admin/includes/languages/english/extra_definitions/additional_customers_fields.php file for more info on this).
 
-You will then need to run the install script.
+- Auto-checked option fields selection - implemented.
+- Javascript listing appearance when selecting SQL fields type, size and more (note: the fields and types are based from your includes/zc_install/sql/mysql_zencart.sql file).
+- Auto-verification files, constructor and functions implemented as it checks each times you execute the 'Add Customers Fields' page (under the admin's header bar).
+- Reset listing table link (only listing table - not your core table).
+- Create additional customers fields - wizard basis.
+- MessageStack messages implemented for each negative actions.
+- Set activation of each fields by a single click from the 'Add Customers Fields' 's main page.
+- Test for each files under admin/customers.php page before officially publishing your created fields to your customer's form - implemented.
+  Note: If you already added customers fields manually into the admin/customers.php file, 
+- Possibility to set URL fields (Remote or Local links).
 
-To do this you need to open a browser and type in the URL.
+  you have two options:
 
-If you are running on a your own computer, this will be
+  1 - Remove these fields and use these names under the admin's extra definitions folder.
+  2 - Keep your manual fields there but as long as you do NOT add these definitions under the admin's extra definitions folder (considering you already made manual additions to admin/customers.php file in the past).
 
-   http://localhost/{zen-cart-directory}/zc_install/
+  However, I'd personally recommend option 1 since, once you have removed these manual fields, you can add them into the arrays 'the way you want them
+  to be' (length fields included now - updated on May 22 2008 - starting on v3.0 release).
 
-or if on a live server:
+- Delete each additional customers fields without affecting your custom templates - implemented.
+- Auto-update of each additional customers fields with core fields without affecting your current readings under the TABLE_CUSTOMERS table - implemented.
+- Create account page process - additional customers fields updated into the TABLE_CUSTOMERS table without affecting any previous readings - implemented.
 
-   http://{www.mydomain.com}/zc_install/
+// Installation
 
-You then only need to follow the prompts to install Zen Cart(tm).
+Simply upload all the files, from this ZIP package, - except for the following ones:
 
-For more detailed installation instructions, please see the /docs/1.readme_installation.html document in this distribution.
+- admin/customers.php file.
+- includes/modules/<your_template>/create_account.php file.
+- includes/modules/pages/account_edit/header_php.php file.
+- includes/templates/<your_template>/templates/tpl_account_edit_default.php file.
+- includes/templates/<your_template>/templates/tpl_modules_create_account.php file.
+- includes/classes/order.php file.
+- includes/auto_loaders/config.core.php file.
 
+Use a comparing tool software for the listed files above.
 
+Note: All paragraphs that needs to be added to your files, from the listed files above, are identified, with this title MOD name, from the beginning to the end.
 
+Go to your admin - > tools - > Install SQL Patches - then add the following content to your database (make a backup first in case if fails):
 
+CREATE TABLE customers_additional (
+  field_id int(11) NOT NULL auto_increment,
+  field_name varchar(255) NOT NULL default '',
+  field_status char(2) NOT NULL default '',
+  PRIMARY KEY (field_id)
+) ENGINE=MyISAM;
 
+// How it works . . .
 
-(Document Revision: $Id: INSTALL.TXT 4833 2006-10-25 03:02:02Z drbyte $)
+Once all the files has been uploaded successfully + compared from the listed files above with yours:
+
+- Execute this MOD from your admin's header bar menu (customers -> Add Customers Fields). Make sure the diagnostic reports no error(s).
+- Go to your admin - > Customers's core page. Then, open your FTP / cPanel access, 
+  go to your admin/includes/languages/english/extra_definitions/additional_customers_fields.php file to follow the rest of the instructions.
+
+- Once followed, refresh your Customers's core page and see if your title(s) and element(s) are filled out in correctly into the arrays.
+- Test your fields.
+- Edit your customized template with the created field(s) by following the example from this package - on how to do so.
+- Go back to your customer's core page, fill out some readings.
+- Check again, on the same page, to see if your readings were being entered correctly.
+- Go back to your customers - > Add customers fields page link and activate the field(s) - and VOILA !
+
+// *** May 22 2008 ***
+
+Read the 'manual.ppt' file for more detailed instructions.
+
+// *** End of update May 22 2008 ***
+
+Update for v2.0 release: Please read the changelog documentation for more details on how the latest release works.
+
+// Basic questions:
+
+- What if I decide to reset my listing tables, will my additional fields, from my TABLE_CUSTOMERS table be affected as well ?
+No and no. If you decide to re-add them into your list, mySQL could probably mention that you have duplicated fields.
+
+- Do I need to modify the listing table manually over PHPMYADMIN ?
+Absolutely not. All (or most) modifications can be done from the admin's end.
+
+- How would I know if these procedures are safe ?
+For each fields creation you will make, you'll be notified as well as recommended to do some operations before these actions are being officially sent to the server.
+
+// Support
+If you'd like to report a bug, please do so on the forum. I will assist as soon as possible. Thank you all for your generous understanding
+and patience you have put on this in order, for me, to code this beast entirely.
+
+// Donation
+If you like this MOD, please send a donation to: scoutch@gmail.com (paypal). It would be greatly appreciated (especially for all the time you waited for this moment to happend).
+
+Regards and best to you all,
+
+TheOracle.
+User of Zen-Cart E-Commerce Script.
+http://www.zen-cart.com/forum .

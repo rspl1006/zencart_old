@@ -59,12 +59,15 @@ class shipping extends base {
   }
 
   function calculate_boxes_weight_and_tare() {
-    global $total_weight, $shipping_weight, $shipping_quoted, $shipping_num_boxes;
+    global $total_weight, $shipping_weight, $shipping_quoted, $shipping_num_boxes,$ups_packages,$shipping_packages,$total_domestic_weight,$total_international_weight,  $shipping_domestic_weight, $shipping_international_weight;
 
     if (is_array($this->modules)) {
       $shipping_quoted = '';
       $shipping_num_boxes = 1;
       $shipping_weight = $total_weight;
+      $shipping_packages =  $ups_packages;
+      $shipping_domestic_weight = $total_domestic_weight;
+      $shipping_international_weight =  $total_international_weight;
 
       $za_tare_array = split("[:,]" , SHIPPING_BOX_WEIGHT);
       $zc_tare_percent= $za_tare_array[0];

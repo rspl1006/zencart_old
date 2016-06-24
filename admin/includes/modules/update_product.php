@@ -20,17 +20,107 @@
     // Data-cleaning to prevent MySQL5 data-type mismatch errors:
     $tmp_value = zen_db_prepare_input($_POST['products_quantity']);
     $products_quantity = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_type']);
+    $products_type = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_declared_value']);
+    $products_declared_value = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
     $tmp_value = zen_db_prepare_input($_POST['products_price']);
     $products_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+	
+    $tmp_value = zen_db_prepare_input($_POST['products_group_a_price']);
+    $products_group_a_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_b_price']);
+    $products_group_b_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_c_price']);
+    $products_group_c_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_d_price']);
+    $products_group_d_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_e_price']);
+    $products_group_e_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_f_price']);
+    $products_group_f_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_g_price']);
+    $products_group_g_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_h_price']);
+    $products_group_h_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_i_price']);
+    $products_group_i_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_j_price']);
+    $products_group_j_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_k_price']);
+    $products_group_k_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_l_price']);
+    $products_group_l_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_m_price']);
+    $products_group_m_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_n_price']);
+    $products_group_n_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_o_price']);
+    $products_group_o_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_p_price']);
+    $products_group_p_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_q_price']);
+    $products_group_q_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_r_price']);
+    $products_group_r_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_s_price']);
+    $products_group_s_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['products_group_t_price']);
+    $products_group_t_price = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+
+	
     $tmp_value = zen_db_prepare_input($_POST['products_weight']);
     $products_weight = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
     $tmp_value = zen_db_prepare_input($_POST['manufacturers_id']);
     $manufacturers_id = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
-
+    $tmp_value = zen_db_prepare_input($_POST['package_as_accessory']);
+    $package_as_accessory = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    
+	$tmp_value = zen_db_prepare_input($_POST['package_one_length']);
+    $package_one_length = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['package_one_width']);
+    $package_one_width = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['package_one_height']);
+    $package_one_height = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+	
+	$tmp_value = zen_db_prepare_input($_POST['package_two_length']);
+    $package_two_length = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['package_two_width']);
+    $package_two_width = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+    $tmp_value = zen_db_prepare_input($_POST['package_two_height']);
+    $package_two_height = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+	
+    $tmp_value = zen_db_prepare_input($_POST['require_witech_system']);
+    $require_witech_system = (!zen_not_null($tmp_value) || $tmp_value=='' || $tmp_value == 0) ? 0 : $tmp_value;
+	
     $sql_data_array = array('products_quantity' => $products_quantity,
                             'products_type' => zen_db_prepare_input($_GET['product_type']),
                             'products_model' => zen_db_prepare_input($_POST['products_model']),
+                            'products_type' => $products_type,
+                            'products_declared_value' => $products_declared_value,
                             'products_price' => $products_price,
+							
+                            'products_group_a_price' => $products_group_a_price,
+                            'products_group_b_price' => $products_group_b_price,
+                            'products_group_c_price' => $products_group_c_price,
+                            'products_group_d_price' => $products_group_d_price,
+                            'products_group_e_price' => $products_group_e_price,
+                            'products_group_f_price' => $products_group_f_price,
+                            'products_group_g_price' => $products_group_g_price,
+                            'products_group_h_price' => $products_group_h_price,
+                            'products_group_i_price' => $products_group_i_price,
+                            'products_group_j_price' => $products_group_j_price,
+                            'products_group_k_price' => $products_group_k_price,
+                            'products_group_l_price' => $products_group_l_price,
+                            'products_group_m_price' => $products_group_m_price,
+                            'products_group_n_price' => $products_group_n_price,
+                            'products_group_o_price' => $products_group_o_price,
+                            'products_group_p_price' => $products_group_p_price,
+                            'products_group_q_price' => $products_group_q_price,
+                            'products_group_r_price' => $products_group_r_price,
+                            'products_group_s_price' => $products_group_s_price,
+                            'products_group_t_price' => $products_group_t_price,
+							
                             'products_date_available' => $products_date_available,
                             'products_weight' => $products_weight,
                             'products_status' => zen_db_prepare_input($_POST['products_status']),
@@ -49,7 +139,15 @@
                             'products_sort_order' => (int)zen_db_prepare_input($_POST['products_sort_order']),
                             'products_discount_type' => zen_db_prepare_input($_POST['products_discount_type']),
                             'products_discount_type_from' => zen_db_prepare_input($_POST['products_discount_type_from']),
-                            'products_price_sorter' => zen_db_prepare_input($_POST['products_price_sorter'])
+                            'products_price_sorter' => zen_db_prepare_input($_POST['products_price_sorter']),
+							'package_as_accessory' => $package_as_accessory,
+							'package_one_length' => $package_one_length,
+							'package_one_width' => $package_one_width,
+							'package_one_height' => $package_one_height,
+							'package_two_length' => $package_two_length,
+							'package_two_width' => $package_two_width,
+							'package_two_height' => $package_two_height,
+							'require_witech_system' => $require_witech_system
                             );
 
     // when set to none remove from database

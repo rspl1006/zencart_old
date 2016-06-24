@@ -59,19 +59,27 @@
 // TABLES: products, products_to_categories, categories
   function zen_count_products_in_category($category_id, $include_inactive = false) {
     global $db;
+//bof - Hide_imageless module - Jaycode - also added $noimage_where througout this document
+	$noimage_where = '';
+	$cgroup = $db->Execute("select customers_group_pricing from " . TABLE_CUSTOMERS . " where customers_id = '" . (int)$_SESSION['customer_id'] . "'"); 
+	if ($cgroup == 6 || $cgroup == 2 || $cgroup == 4  ) {
+		$noimage_where = " and not p2c.products_type = 4 
+							 and not p.products_type = 4 ";
+	}
+//eof - Hide_imageless module - Jaycode
     $products_count = 0;
     if ($include_inactive == true) {
       $products_query = "select count(*) as total
                          from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c
                          where p.products_id = p2c.products_id
-                         and p2c.categories_id = '" . (int)$category_id . "'";
+                         and p2c.categories_id = '" . (int)$category_id . "'" . $noimage_where;
 
     } else {
       $products_query = "select count(*) as total
                          from " . TABLE_PRODUCTS . " p, " . TABLE_PRODUCTS_TO_CATEGORIES . " p2c
                          where p.products_id = p2c.products_id
                          and p.products_status = '1'
-                         and p2c.categories_id = '" . (int)$category_id . "'";
+                         and p2c.categories_id = '" . (int)$category_id . "'" . $noimage_where;
 
     }
     $products = $db->Execute($products_query);

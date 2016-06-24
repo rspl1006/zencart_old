@@ -5,7 +5,7 @@
  * @license http://www.zen-cart.com/license/2_0.txt GNU Public License V2.0
  * @version $Id: curltest.php 7126 2007-09-29 00:17:50Z drbyte $
  */
-  error_reporting(E_ALL);
+  //error_reporting(E_ALL);
 
   $defaultURL = "http://www.zen-cart.com/testcurl.php";
   $useSSL = (isset($_GET['ssl']) && (strtolower($_GET['ssl']) == 'yes' || $_GET['ssl'] == 1)) ? true : false;

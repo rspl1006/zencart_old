@@ -25,7 +25,8 @@ if (!$_SESSION['valid_to_checkout']) {
 }
 
 // build shipping with Tare included
-$shipping_weight = $_SESSION['cart']->show_weight();
+$domestic_shipping_weight = $_SESSION['cart']->show_ups_domestic_weight();
+$international_shipping_weight = $_SESSION['cart']->show_ups_international_weight();
 /*
   $shipping_weight = 0;
   require(DIR_WS_CLASSES . 'order.php');
@@ -40,10 +41,10 @@ $shipping_weight = $_SESSION['cart']->show_weight();
 $totalsDisplay = '';
 switch (true) {
   case (SHOW_TOTALS_IN_CART == '1'):
-  $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_WEIGHT . $shipping_weight . TEXT_PRODUCT_WEIGHT_UNIT . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
+  $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() .($domestic_shipping_weight != $international_shipping_weight ? TEXT_TOTAL_WEIGHT . number_format($domestic_shipping_weight,2) . ' - ' . number_format($international_shipping_weight,2)  . ' ' . TEXT_PRODUCT_WEIGHT_UNIT: TEXT_TOTAL_WEIGHT . number_format($domestic_shipping_weight,2)) . ' ' . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
   break;
   case (SHOW_TOTALS_IN_CART == '2'):
-  $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . ($shipping_weight > 0 ? TEXT_TOTAL_WEIGHT . $shipping_weight . TEXT_PRODUCT_WEIGHT_UNIT : '') . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
+  $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . ($domestic_shipping_weight != $international_shipping_weight ? TEXT_TOTAL_WEIGHT . number_format($domestic_shipping_weight,2) . ' - ' . number_format($international_shipping_weight,2) . TEXT_PRODUCT_WEIGHT_UNIT : TEXT_TOTAL_WEIGHT . number_format($domestic_shipping_weight,2)) . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
   break;
   case (SHOW_TOTALS_IN_CART == '3'):
   $totalsDisplay = TEXT_TOTAL_ITEMS . $_SESSION['cart']->count_contents() . TEXT_TOTAL_AMOUNT . $currencies->format($_SESSION['cart']->show_total());
@@ -137,7 +138,9 @@ for ($i=0, $n=sizeof($products); $i<$n; $i++) {
   $showFixedQuantityAmount = $products[$i]['quantity'] . zen_draw_hidden_field('cart_quantity[]', $products[$i]['quantity']);
   $showMinUnits = zen_get_products_quantity_min_units_display($products[$i]['id']);
   $quantityField = zen_draw_input_field('cart_quantity[]', $products[$i]['quantity'], 'size="4"');
-  $buttonUpdate = ((SHOW_SHOPPING_CART_UPDATE == 1 or SHOW_SHOPPING_CART_UPDATE == 3) ? zen_image_submit(ICON_IMAGE_UPDATE, ICON_UPDATE_ALT) : '') . zen_draw_hidden_field('products_id[]', $products[$i]['id']);
+  //$buttonUpdate = ((SHOW_SHOPPING_CART_UPDATE == 1 or SHOW_SHOPPING_CART_UPDATE == 3) ? zen_image_submit(ICON_IMAGE_UPDATE, ICON_UPDATE_ALT) : '') . zen_draw_hidden_field('products_id[]', $products[$i]['id']);
+  $buttonUpdate = zen_draw_hidden_field('products_id[]', $products[$i]['id']);
+  
   $productsPrice = $currencies->display_price($products[$i]['final_price'], zen_get_tax_rate($products[$i]['tax_class_id']), $products[$i]['quantity']) . ($products[$i]['onetime_charges'] != 0 ? '<br />' . $currencies->display_price($products[$i]['onetime_charges'], zen_get_tax_rate($products[$i]['tax_class_id']), 1) : '');
   $productsPriceEach = $currencies->display_price($products[$i]['final_price'], zen_get_tax_rate($products[$i]['tax_class_id']), 1) . ($products[$i]['onetime_charges'] != 0 ? '<br />' . $currencies->display_price($products[$i]['onetime_charges'], zen_get_tax_rate($products[$i]['tax_class_id']), 1) : '');
   $productArray[$i] = array('attributeHiddenField'=>$attributeHiddenField,

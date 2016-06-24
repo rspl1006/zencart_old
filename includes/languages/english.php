@@ -46,7 +46,7 @@
   define('HTML_PARAMS','dir="ltr" lang="en"');
 
 // charset for web pages and emails
-  define('CHARSET', 'iso-8859-1');
+  define('CHARSET', 'utf-8');
 
 // footer text in includes/footer.php
   define('FOOTER_TEXT_REQUESTS_SINCE', 'requests since');
@@ -304,7 +304,7 @@
 
   define('TEXT_NO_NEW_PRODUCTS', 'More new products will be added soon. Please check back later.');
 
-  define('TEXT_UNKNOWN_TAX_RATE', 'Sales Tax');
+  define('TEXT_UNKNOWN_TAX_RATE', '*Estimated Duties & Taxes');
 
   define('TEXT_REQUIRED', '<span class="errorText">Required</span>');
 

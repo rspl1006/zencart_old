@@ -17,6 +17,7 @@ if (!$_SESSION['customer_id']) {
 }
 
 require(DIR_WS_MODULES . zen_get_module_directory('require_languages.php'));
+
 if (isset($_POST['action']) && ($_POST['action'] == 'process')) {
   if (ACCOUNT_GENDER == 'true') $gender = zen_db_prepare_input($_POST['gender']);
   $firstname = zen_db_prepare_input($_POST['firstname']);
@@ -30,6 +31,12 @@ if (isset($_POST['action']) && ($_POST['action'] == 'process')) {
   if (CUSTOMERS_REFERRAL_STATUS == '2' and $_POST['customers_referral'] != '') $customers_referral = zen_db_prepare_input($_POST['customers_referral']);
 
   $error = false;
+  
+  // Additional customers fields.    
+  if (!$customersFields->validatePostContent()) {      
+      $error = true;      
+  }
+  // End of additional customers fields.
 
   if (ACCOUNT_GENDER == 'true') {
     if ( ($gender != 'm') && ($gender != 'f') ) {
@@ -87,7 +94,6 @@ if (isset($_POST['action']) && ($_POST['action'] == 'process')) {
     }
   }
 
-
   if (strlen($telephone) < ENTRY_TELEPHONE_MIN_LENGTH) {
     $error = true;
 
@@ -124,6 +130,13 @@ if (isset($_POST['action']) && ($_POST['action'] == 'process')) {
     $where_clause = "customers_id = :customersID";
     $where_clause = $db->bindVars($where_clause, ':customersID', $_SESSION['customer_id'], 'integer');
     $db->perform(TABLE_CUSTOMERS, $sql_data_array, 'update', $where_clause);
+    
+    // Additional Customers Fields.            
+    if (sizeof($customersFields->updatePostContent()) > 0) {            
+        $sql_update = "UPDATE " . TABLE_CUSTOMERS . " SET " . $customersFields->updatePostContent() . " WHERE customers_id = '" . (int)$_SESSION['customer_id'] . "'";
+        $db->Execute($sql_update);    
+    }
+    // End of Additional Customers Fields.
 
     $sql = "UPDATE " . TABLE_CUSTOMERS_INFO . "
             SET    customers_info_date_account_last_modified = now()
@@ -152,14 +165,17 @@ if (isset($_POST['action']) && ($_POST['action'] == 'process')) {
   }
 }
 
+// Additional customers fields.
 $account_query = "SELECT customers_gender, customers_firstname, customers_lastname,
                          customers_dob, customers_email_address, customers_telephone,
-                         customers_fax, customers_email_format, customers_referral
+                         customers_fax, customers_email_format, customers_referral" . $customersFields->showFields() . "
                   FROM   " . TABLE_CUSTOMERS . "
                   WHERE  customers_id = :customersID";
 
 $account_query = $db->bindVars($account_query, ':customersID', $_SESSION['customer_id'], 'integer');
 $account = $db->Execute($account_query);
+// End of additional customers fields.
+
 if (ACCOUNT_GENDER == 'true') {
   if (isset($gender)) {
     $male = ($gender == 'm') ? true : false;

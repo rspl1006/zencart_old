@@ -38,7 +38,7 @@ define('PAGE_PARSE_START_TIME', microtime());
 /**
  * set the level of error reporting
  */
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(0);
 
 // set php_self in the local scope
 if (!isset($PHP_SELF)) $PHP_SELF = $_SERVER['PHP_SELF'];

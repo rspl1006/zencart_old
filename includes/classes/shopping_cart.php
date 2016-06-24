@@ -36,6 +36,23 @@ class shoppingCart extends base {
    */
   var $weight;
   /**
+   * UPS Domestic shipping weight
+   * @var decimal
+   */
+  var $ups_domestic_weight;
+  
+  
+  /**
+   * Packaging Array
+   */
+  var $packaging;
+  
+  /**
+   * UPS international shipping weight
+   * @var decimal
+   */
+  var $ups_international_weight;
+  /**
    * cart identifier
    * @var integer
    */
@@ -60,6 +77,12 @@ class shoppingCart extends base {
    * @var decimal
    */
   var $free_shipping_price;
+  
+   /**
+   * Array of reasons why the order should be reviewed.
+   */
+  var $review_reasons;
+  
   /**
    * constructor method
    *
@@ -198,12 +221,27 @@ class shoppingCart extends base {
     $this->contents = array();
     $this->total = 0;
     $this->weight = 0;
+    $this->ups_domestic_weight = 0;
+    $this->ups_international_weight = 0;
     $this->content_type = false;
+	$this->packaging = array();
+	$this->review_reasons = array();
 
     // shipping adjustment
     $this->free_shipping_item = 0;
     $this->free_shipping_price = 0;
     $this->free_shipping_weight = 0;
+
+	if($_SESSION['customer_id']) {
+      $customer_group_query = "select gp.group_name
+                                from " . TABLE_CUSTOMERS . " cu
+                                left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                               where cu.customers_id = " . $_SESSION['customer_id'];
+      if($customer_group = $db->Execute($customer_group_query)) {
+        $customers_group=$customer_group->fields['group_name'];
+      }
+    }
+
 
     if (isset($_SESSION['customer_id']) && ($reset_database == true)) {
       $sql = "delete from " . TABLE_CUSTOMERS_BASKET . "
@@ -221,6 +259,7 @@ class shoppingCart extends base {
     $_SESSION['cartID'] = '';
     $this->notify('NOTIFIER_CART_RESET_END');
   }
+  
   /**
    * Method to add an item to the cart
    *
@@ -346,6 +385,7 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
    */
   function update_quantity($products_id, $quantity = '', $attributes = '') {
     global $db;
+	
     $this->notify('NOTIFIER_CART_UPDATE_QUANTITY_START');
     if (empty($quantity)) return true; // nothing needs to be updated if theres no quantity, so we return true..
 
@@ -591,7 +631,11 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
   function calculate() {
     global $db;
     $this->total = 0;
+	$this->packaging = array();
     $this->weight = 0;
+    $this->ups_domestic_weight = 0;
+    $this->ups_international_weight = 0;
+	$this->review_reasons = array();
 
     // shipping adjustment
     $this->free_shipping_item = 0;
@@ -599,36 +643,97 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
     $this->free_shipping_weight = 0;
 
     if (!is_array($this->contents)) return 0;
+	
+	if($_SESSION['customer_id']) {
+	  $customer_group_query = "select gp.group_name
+								from " . TABLE_CUSTOMERS . " cu
+								left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+							   where cu.customers_id = " . $_SESSION['customer_id'];
+	  if($customer_group = $db->Execute($customer_group_query)) {
+		$customers_group=$customer_group->fields['group_name'];
+	  }
+	}
 
+	$has_accessories = false;
+	$package_count = 0;
     reset($this->contents);
     while (list($products_id, ) = each($this->contents)) {
       $qty = $this->contents[$products_id]['qty'];
 
       // products price
-      $product_query = "select products_id, products_price, products_tax_class_id, products_weight,
-                          products_priced_by_attribute, product_is_always_free_shipping, products_discount_type, products_discount_type_from,
-                          products_virtual, products_model
-                          from " . TABLE_PRODUCTS . "
-                          where products_id = '" . (int)$products_id . "'";
+     $product_query = "select products_id, products_price, products_tax_class_id, products_weight,
+                         products_priced_by_attribute, product_is_always_free_shipping, products_discount_type, products_discount_type_from,
+                         products_group_a_price, products_group_b_price, products_group_c_price, products_group_d_price,
+                         products_virtual, products_model, package_as_accessory,
+						 package_one_length, package_one_width, package_one_height,
+						 package_two_length, package_two_width, package_two_height,
+						 require_witech_system
+                         from " . TABLE_PRODUCTS . "
+                        where products_id = '" . (int)$products_id . "'";
 
       if ($product = $db->Execute($product_query)) {
         $prid = $product->fields['products_id'];
         $products_tax = zen_get_tax_rate($product->fields['products_tax_class_id']);
         $products_price = $product->fields['products_price'];
-
-        // adjusted count for free shipping
-        if ($product->fields['product_is_always_free_shipping'] != 1 and $product->fields['products_virtual'] != 1) {
-          $products_weight = $product->fields['products_weight'];
-        } else {
-          $products_weight = 0;
+        if($customers_group) {
+          if($customers_group == GROUP_PRICE_PER_ITEM1 && $product->fields['products_group_a_price'] != 0) {
+            $products_price = $product->fields['products_group_a_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM2 && $product->fields['products_group_b_price'] != 0) {
+            $products_price = $product->fields['products_group_b_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM3 && $product->fields['products_group_c_price'] != 0) {
+            $products_price = $product->fields['products_group_c_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM4 && $product->fields['products_group_d_price'] != 0) {
+            $products_price = $product->fields['products_group_d_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM5 && $product->fields['products_group_e_price'] != 0) {
+            $products_price = $product->fields['products_group_e_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM6 && $product->fields['products_group_f_price'] != 0) {
+            $products_price = $product->fields['products_group_f_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM7 && $product->fields['products_group_g_price'] != 0) {
+            $products_price = $product->fields['products_group_g_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM8 && $product->fields['products_group_h_price'] != 0) {
+            $products_price = $product->fields['products_group_h_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM9 && $product->fields['products_group_i_price'] != 0) {
+            $products_price = $product->fields['products_group_i_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM10 && $product->fields['products_group_j_price'] != 0) {
+            $products_price = $product->fields['products_group_j_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM11 && $product->fields['products_group_k_price'] != 0) {
+            $products_price = $product->fields['products_group_k_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM12 && $product->fields['products_group_l_price'] != 0) {
+            $products_price = $product->fields['products_group_l_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM13 && $product->fields['products_group_m_price'] != 0) {
+            $products_price = $product->fields['products_group_m_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM14 && $product->fields['products_group_n_price'] != 0) {
+            $products_price = $product->fields['products_group_n_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM15 && $product->fields['products_group_o_price'] != 0) {
+            $products_price = $product->fields['products_group_o_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM16 && $product->fields['products_group_p_price'] != 0) {
+            $products_price = $product->fields['products_group_p_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM17 && $product->fields['products_group_q_price'] != 0) {
+            $products_price = $product->fields['products_group_q_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM18 && $product->fields['products_group_r_price'] != 0) {
+            $products_price = $product->fields['products_group_r_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM19 && $product->fields['products_group_s_price'] != 0) {
+            $products_price = $product->fields['products_group_s_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM20 && $product->fields['products_group_t_price'] != 0) {
+            $products_price = $product->fields['products_group_t_price'];
+          }
         }
 
-        $special_price = zen_get_products_special_price($prid);
-        if ($special_price and $product->fields['products_priced_by_attribute'] == 0) {
-          $products_price = $special_price;
-        } else {
-          $special_price = 0;
-        }
+
+
+ // exclude group price
+// DJS MOD 06/10/2009
+//        if(!$customers_group) {
+// END MOD
+           $special_price = zen_get_products_special_price($prid);
+           if ($special_price and $product->fields['products_priced_by_attribute'] == 0) {
+             $products_price = $special_price;
+           } else {
+             $special_price = 0;
+           }
+// DJS MOD 06/10/2009
+//        }
+// END MOD
 
         if (zen_get_products_price_is_free($product->fields['products_id'])) {
           // no charge
@@ -641,13 +746,25 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
           //            $products_price = $products->fields['products_price'];
           if ($special_price) {
             $products_price = $special_price;
-          } else {
-            $products_price = $product->fields['products_price'];
-          }
-        } else {
-          // discount qty pricing
-          if ($product->fields['products_discount_type'] != '0') {
-            $products_price = zen_get_products_discount_price_qty($product->fields['products_id'], $qty);
+
+		   // exclude group price
+            if(!$customers_group) {
+              if ($product->fields['products_priced_by_attribute'] == '1' and zen_has_product_attributes($product->fields['products_id'], 'false')) {
+                // reset for priced by attributes
+                if ($special_price) {
+                  $products_price = $special_price;
+                } else {
+                  $products_price = $product->fields['products_price'];
+                }
+              } else {
+                // discount qty pricing
+                if ($product->fields['products_discount_type'] != '0') {
+                  $products_price = zen_get_products_discount_price_qty($product->fields['products_id'], $qty);
+                }
+              }
+            }
+
+
           }
         }
 
@@ -659,7 +776,58 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
         }
 
         $this->total += zen_add_tax($products_price, $products_tax) * $qty;
-        $this->weight += ($qty * $products_weight);
+		
+		
+		if($product->fields['require_witech_system'] == 1){
+			$_SESSION['cart']->add_review_reason('WAG_REQUIRED');
+		}
+		
+		//wiTECH Addition: if the product is supposed to be packaged as an accessory, do not include it's weight but indicate the order has accessories
+		if ($product->fields['package_as_accessory'] == 1){ // Product is packaged as an accessory
+			$has_accessories = true;
+			$products_weight = 0;
+			$accessory_count += (1 * $qty);
+			if($accessory_count >= 5){
+				$_SESSION['cart']->add_review_reason('MULTIPLE_ACCESSORIES');
+			}
+		} else  if ($product->fields['product_is_always_free_shipping'] == 1 or $product->fields['products_virtual'] == 1) { //free shipping or is virtual
+		    $products_weight = 0;	 
+		} else { // regular calulation
+		
+			$products_weight = $product->fields['products_weight'];
+						
+			$package_one_length = $product->fields['package_one_length'];
+			$package_one_width = $product->fields['package_one_width'];
+			$package_one_height = $product->fields['package_one_height'];
+			$package_two_length = $product->fields['package_two_length'];
+			$package_two_width = $product->fields['package_two_width'];
+			$package_two_height = $product->fields['package_two_height'];
+			
+			$products_dimensional_domestic_weight = (($package_one_length * $package_one_width * $package_one_height)/194) + (($package_two_length * $package_two_width * $package_two_height)/194);
+			$products_dimensional_international_weight = (($package_one_length * $package_one_width * $package_one_height)/166) + (($package_two_length * $package_two_width * $package_two_height)/166);
+			
+			if ($products_weight >= $products_dimensional_domestic_weight){
+				$products_domestic_weight = $products_weight;
+			} else {
+				$products_domestic_weight = $products_dimensional_domestic_weight;
+			}
+			
+			if ($products_weight >= $products_dimensional_international_weight){
+				$products_international_weight = $products_weight;
+			} else {
+				$products_international_weight = $products_dimensional_international_weight;
+			}
+			
+			for($i = 0;$i < $qty;$i++){
+				$package_count += 1;
+				$this->packaging[$package_count] = array('domestic' => $products_domestic_weight, 'international' => $products_international_weight );
+			}
+			$this->ups_domestic_weight += ($qty * $products_domestic_weight);
+			$this->ups_international_weight += ($qty * $products_international_weight);
+				
+		}
+		
+		$this->weight += ($qty * $products_weight);
       }
 
       $adjust_downloads = 0;
@@ -719,24 +887,24 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
                 $this->total += $qty * zen_add_tax($attribute_price->fields['options_values_price'], $products_tax);
               }
             } // eof: attribute price
-// adjust for downloads
-// adjust products price
-  $check_attribute = $attribute_price->fields['products_attributes_id'];
-  $sql = "select *
-                    from " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
-                    where products_attributes_id = '" . $check_attribute . "'";
-  $check_download = $db->Execute($sql);
-  if ($check_download->RecordCount()) {
-// do not count download as free when set to product/download combo
-    if ($adjust_downloads == 1 and $product->fields['product_is_always_free_shipping'] != 2) {
-      $this->free_shipping_price += zen_add_tax($products_price, $products_tax) * $qty;
-      $this->free_shipping_item += $qty;
-    }
-// adjust for attributes price
-    $this->free_shipping_price += $qty * zen_add_tax( ($new_attributes_price), $products_tax);
-//die('I SEE B ' . $this->free_shipping_price);
-  }
-//  echo 'I SEE ' . $this->total . ' vs ' . $this->free_shipping_price . ' items: ' . $this->free_shipping_item. '<br>';
+			// adjust for downloads
+			// adjust products price
+			  $check_attribute = $attribute_price->fields['products_attributes_id'];
+			  $sql = "select *
+								from " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . "
+								where products_attributes_id = '" . $check_attribute . "'";
+			  $check_download = $db->Execute($sql);
+			  if ($check_download->RecordCount()) {
+			// do not count download as free when set to product/download combo
+				if ($adjust_downloads == 1 and $product->fields['product_is_always_free_shipping'] != 2) {
+				  $this->free_shipping_price += zen_add_tax($products_price, $products_tax) * $qty;
+				  $this->free_shipping_item += $qty;
+				}
+			// adjust for attributes price
+				$this->free_shipping_price += $qty * zen_add_tax( ($new_attributes_price), $products_tax);
+			//die('I SEE B ' . $this->free_shipping_price);
+			  }
+			//  echo 'I SEE ' . $this->total . ' vs ' . $this->free_shipping_price . ' items: ' . $this->free_shipping_item. '<br>';
 
             ////////////////////////////////////////////////
             // calculate additional attribute charges
@@ -813,15 +981,31 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
           }
 
           // + or blank adds
-          if ($attribute_weight->fields['products_attributes_weight_prefix'] == '-') {
-            $this->weight -= $qty * $new_attributes_weight;
-          } else {
-            $this->weight += $qty * $new_attributes_weight;
-          }
+          //if ($attribute_weight->fields['products_attributes_weight_prefix'] == '-') {
+          //  $this->weight -= $qty * $new_attributes_weight;
+          //} else {
+          //  $this->weight += $qty * $new_attributes_weight;
+          //}
         }
       } // attributes weight
 
+	
+	 
     }
+	
+	
+	 
+	//wiTECH Addition: Add an accessory box if this order contains accessories 
+	if ($has_accessories) {
+	 $package_count += 1;
+	 
+	 $products_domestic_weight = (12*6*4)/194;
+	 $products_international_weight = (12*6*4)/166;
+	 
+	 $this->packaging[$package_count] = array('domestic' => $products_domestic_weight, 'international' => $products_international_weight );
+	 $this->ups_domestic_weight += $products_domestic_weight;
+	 $this->ups_international_weight += $products_international_weight;
+	}
   }
   /**
    * Method to calculate price of attributes for a given item
@@ -1051,6 +1235,17 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
   function get_products($check_for_valid_cart = false) {
     global $db;
 
+if($_SESSION['customer_id']) {
+      $customer_group_query = "select gp.group_name
+                                from " . TABLE_CUSTOMERS . " cu
+                                left join " . TABLE_GROUP_PRICING . " gp on cu.customers_group_pricing=gp.group_id
+                               where cu.customers_id = " . $_SESSION['customer_id'];
+      if($customer_group = $db->Execute($customer_group_query)) {
+        $customers_group=$customer_group->fields['group_name'];
+      }
+    }
+
+
     $this->notify('NOTIFIER_CART_GET_PRODUCTS_START');
 
     if (!is_array($this->contents)) return false;
@@ -1059,7 +1254,11 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
     reset($this->contents);
     while (list($products_id, ) = each($this->contents)) {
       $products_query = "select p.products_id, p.master_categories_id, p.products_status, pd.products_name, p.products_model, p.products_image,
-                                  p.products_price, p.products_weight, p.products_tax_class_id,
+                                 p.products_declared_value, p.products_price, p.products_weight, p.products_tax_class_id,
+
+                                  p.products_group_a_price, p.products_group_b_price,
+                                  p.products_group_c_price, p.products_group_d_price,
+
                                   p.products_quantity_order_min, p.products_quantity_order_units,
                                   p.product_is_free, p.products_priced_by_attribute,
                                   p.products_discount_type, p.products_discount_type_from
@@ -1080,32 +1279,90 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
         }
         */
         $special_price = zen_get_products_special_price($prid);
-        if ($special_price and $products->fields['products_priced_by_attribute'] == 0) {
-          $products_price = $special_price;
-        } else {
-          $special_price = 0;
-        }
+
+        // Exclude Group Pricing
+// DJS MOD 06/10/2009
+//		if(!$customers_group) {
+// END MOD
+          if ($special_price and $products->fields['products_priced_by_attribute'] == 0) {
+            $products_price = $special_price;
+          } else {
+            $special_price = 0;
+          }
+// DJS MOD 06/10/2009
+//        }
+// END MOD
 
         if (zen_get_products_price_is_free($products->fields['products_id'])) {
           // no charge
           $products_price = 0;
         }
 
-        // adjust price for discounts when priced by attribute
-        if ($products->fields['products_priced_by_attribute'] == '1' and zen_has_product_attributes($products->fields['products_id'], 'false')) {
-          // reset for priced by attributes
-          //            $products_price = $products->fields['products_price'];
-          if ($special_price) {
-            $products_price = $special_price;
-          } else {
-            $products_price = $products->fields['products_price'];
-          }
-        } else {
-          // discount qty pricing
-          if ($products->fields['products_discount_type'] != '0') {
-            $products_price = zen_get_products_discount_price_qty($products->fields['products_id'], $this->contents[$products_id]['qty']);
+        if($customers_group and $special_price == 0) {
+          if($customers_group == GROUP_PRICE_PER_ITEM1 && $products->fields['products_group_a_price'] != 0) {
+            $products_price = $products->fields['products_group_a_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM2 && $products->fields['products_group_b_price'] != 0) {
+            $products_price = $products->fields['products_group_b_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM3 && $products->fields['products_group_c_price'] != 0) {
+            $products_price = $products->fields['products_group_c_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM4 && $products->fields['products_group_d_price'] != 0) {
+            $products_price = $products->fields['products_group_d_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM5 && $products->fields['products_group_e_price'] != 0) {
+            $products_price = $products->fields['products_group_e_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM6 && $products->fields['products_group_f_price'] != 0) {
+            $products_price = $products->fields['products_group_f_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM7 && $products->fields['products_group_g_price'] != 0) {
+            $products_price = $products->fields['products_group_g_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM8 && $products->fields['products_group_h_price'] != 0) {
+            $products_price = $products->fields['products_group_h_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM9 && $products->fields['products_group_i_price'] != 0) {
+            $products_price = $products->fields['products_group_i_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM10 && $products->fields['products_group_j_price'] != 0) {
+            $products_price = $products->fields['products_group_j_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM11 && $products->fields['products_group_k_price'] != 0) {
+            $products_price = $products->fields['products_group_k_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM12 && $products->fields['products_group_l_price'] != 0) {
+            $products_price = $products->fields['products_group_l_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM13 && $products->fields['products_group_m_price'] != 0) {
+            $products_price = $products->fields['products_group_m_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM14 && $products->fields['products_group_n_price'] != 0) {
+            $products_price = $products->fields['products_group_n_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM15 && $products->fields['products_group_o_price'] != 0) {
+            $products_price = $products->fields['products_group_o_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM16 && $products->fields['products_group_p_price'] != 0) {
+            $products_price = $products->fields['products_group_p_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM17 && $products->fields['products_group_q_price'] != 0) {
+            $products_price = $products->fields['products_group_q_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM18 && $products->fields['products_group_r_price'] != 0) {
+            $products_price = $products->fields['products_group_r_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM19 && $products->fields['products_group_s_price'] != 0) {
+            $products_price = $products->fields['products_group_s_price'];
+          } elseif($customers_group == GROUP_PRICE_PER_ITEM20 && $products->fields['products_group_t_price'] != 0) {
+            $products_price = $products->fields['products_group_t_price'];
           }
         }
+
+        // adjust price for discounts when priced by attribute
+// DJS MOD 06/10/2009
+//		if(!$customers_group) {
+// END MOD
+          if ($products->fields['products_priced_by_attribute'] == '1' and zen_has_product_attributes($products->fields['products_id'], 'false')) {
+            // reset for priced by attributes
+            //            $products_price = $products->fields['products_price'];
+            if ($special_price) {
+              $products_price = $special_price;
+            } else {
+              $products_price = $products->fields['products_price'];
+            }
+          } else {
+                       // discount qty pricing
+            if ($products->fields['products_discount_type'] != '0') {
+              $products_price = zen_get_products_discount_price_qty($products->fields['products_id'], $this->contents[$products_id]['qty']);
+            }
+          }
+// DJS MOD 06/10/2009
+//        }
+// END MOD
 
 // validate cart contents for checkout
         if ($check_for_valid_cart == true) {
@@ -1184,6 +1441,7 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
                                   'name' => $products->fields['products_name'],
                                   'model' => $products->fields['products_model'],
                                   'image' => $products->fields['products_image'],
+                                  'declared_value' => $products->fields['products_declared_value'],
                                   'price' => ($products->fields['product_is_free'] =='1' ? 0 : $products_price),
         //                                    'quantity' => $this->contents[$products_id]['qty'],
                                   'quantity' => $new_qty,
@@ -1222,6 +1480,36 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
   function show_weight() {
     $this->calculate();
     return $this->weight;
+  }
+  
+  /**
+   * Method to calculate all domestic and international package weights
+   *
+   * @return array of array of domestic and international weights per package
+   */
+  function get_packages() {
+    $this->calculate();
+    return $this->packaging;
+  }
+  
+  /**
+   * Method to calculate total weight of items in cart based on UPS domestic weight rules
+   *
+   * @return decimal Total Weight
+   */
+  function show_ups_domestic_weight() {
+    $this->calculate();
+    return $this->ups_domestic_weight;
+  }
+  
+  /**
+   * Method to calculate total weight of items in cart based on UPS international weight rules
+   *
+   * @return decimal Total Weight
+   */
+  function show_ups_international_weight() {
+    $this->calculate();
+    return $this->ups_international_weight;
   }
   /**
    * Method to generate a cart ID
@@ -1400,6 +1688,7 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
 
     // reset($this->contents); // breaks cart
     $check_contents = $this->contents;
+    reset($check_contents);
     while (list($products_id, ) = each($check_contents)) {
       $test_id = zen_get_prid($products_id);
       if ($test_id == $chk_products_id) {
@@ -1434,6 +1723,7 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
 
     // reset($this->contents); // breaks cart
     $check_contents = $this->contents;
+    reset($check_contents);
     while (list($products_id, ) = each($check_contents)) {
       $test_id = zen_get_prid($products_id);
       if ($test_id == $chk_products_id) {
@@ -1510,6 +1800,32 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
 
     return $this->free_shipping_weight;
   }
+  
+  
+  function get_review_reasons() {
+	return $this->review_reasons;
+  }
+   /**
+   * Method to add a review reason to the order.
+   */
+  function add_review_reason($review_reason_code) {
+    global $db;
+
+	$review_query = "SELECT orders_review_reason_id FROM zen_orders_review_reason WHERE code = '" . $review_reason_code ."'";
+    $review_reason = $db->Execute($review_query);
+	$review_reason_id = $review_reason->fields['orders_review_reason_id'];
+	
+	$reason_exists = false;
+	foreach ($this->review_reasons as $reason_id){
+		if($reason_id == $review_reason_id){
+			$reason_exists = true;
+		}
+	}
+	if(!$reason_exists){		
+		$this->review_reasons[] = $review_reason_id;
+	}
+  }
+  
   /**
    * Method to handle cart Action - update product
    *
@@ -1519,7 +1835,9 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
   function actionUpdateProduct($goto, $parameters) {
     global $messageStack;
 
+	
     for ($i=0, $n=sizeof($_POST['products_id']); $i<$n; $i++) {
+	  
       $adjust_max= 'false';
       if ( in_array($_POST['products_id'][$i], (is_array($_POST['cart_delete']) ? $_POST['cart_delete'] : array())) or $_POST['cart_quantity'][$i]==0) {
         $this->remove($_POST['products_id'][$i]);
@@ -1555,6 +1873,7 @@ $qty = $this->adjust_quantity($qty, $products_id, 'shopping_cart');
         }
       }
     }
+	
     zen_redirect(zen_href_link($goto, zen_get_all_get_params($parameters)));
   }
   /**
@@ -1718,39 +2037,39 @@ $new_qty = $this->adjust_quantity($new_qty, $_POST['products_id'], 'shopping_car
     if (is_array($_POST['products_id']) && sizeof($_POST['products_id']) > 0) {
       foreach($_POST['products_id'] as $key=>$val) {
 //      while ( list( $key, $val ) = each($_POST['products_id']) ) {
-        if ($val > 0) {
-          $adjust_max = false;
-          $prodId = $key;
-          $qty = $val;
-          $add_max = zen_get_products_quantity_order_max($prodId);
-          $cart_qty = $this->in_cart_mixed($prodId);
+      if ($val > 0) {
+        $adjust_max = false;
+        $prodId = $key;
+        $qty = $val;
+        $add_max = zen_get_products_quantity_order_max($prodId);
+        $cart_qty = $this->in_cart_mixed($prodId);
 //        $new_qty = $qty;
 //echo 'I SEE actionMultipleAddProduct: ' . $prodId . '<br>';
           $new_qty = $this->adjust_quantity($qty, $prodId, 'shopping_cart');
 
-          if (($add_max == 1 and $cart_qty == 1)) {
-            // do not add
+        if (($add_max == 1 and $cart_qty == 1)) {
+          // do not add
+          $adjust_max= 'true';
+        } else {
+          // adjust quantity if needed
+          if (($new_qty + $cart_qty > $add_max) and $add_max != 0) {
             $adjust_max= 'true';
-          } else {
-            // adjust quantity if needed
-            if (($new_qty + $cart_qty > $add_max) and $add_max != 0) {
-              $adjust_max= 'true';
-              $new_qty = $add_max - $cart_qty;
-            }
-            $this->add_cart($prodId, $this->get_quantity($prodId)+($new_qty));
+            $new_qty = $add_max - $cart_qty;
           }
-          if ($adjust_max == 'true') {
+          $this->add_cart($prodId, $this->get_quantity($prodId)+($new_qty));
+        }
+        if ($adjust_max == 'true') {
 //            $messageStack->add_session('shopping_cart', ERROR_MAXIMUM_QTY . ' C: - ' . zen_get_products_name($prodId), 'caution');
             $messageStack->add_session('shopping_cart', ERROR_MAXIMUM_QTY . zen_get_products_name($prodId), 'caution');
-          }
         }
       }
-// display message if all is good and not on shopping_cart page
-      if (DISPLAY_CART == 'false' && $_GET['main_page'] != FILENAME_SHOPPING_CART) {
-        $messageStack->add_session('header', SUCCESS_ADDED_TO_CART_PRODUCTS, 'success');
-      }
-      zen_redirect(zen_href_link($goto, zen_get_all_get_params($parameters)));
     }
+// display message if all is good and not on shopping_cart page
+    if (DISPLAY_CART == 'false' && $_GET['main_page'] != FILENAME_SHOPPING_CART) {
+      $messageStack->add_session('header', SUCCESS_ADDED_TO_CART_PRODUCTS, 'success');
+    }
+    zen_redirect(zen_href_link($goto, zen_get_all_get_params($parameters)));
+  }
   }
   /**
    * Method to handle cart Action - notify

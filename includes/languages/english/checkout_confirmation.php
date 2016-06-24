@@ -17,7 +17,7 @@ define('HEADING_DELIVERY_ADDRESS', 'Delivery/Shipping Information');
 define('HEADING_SHIPPING_METHOD', 'Shipping Method:');
 define('HEADING_PAYMENT_METHOD', 'Payment Method:');
 define('HEADING_PRODUCTS', 'Shopping Cart Contents');
-define('HEADING_TAX', 'Tax');
+define('HEADING_TAX', 'Estimated Duties & Taxes');
 define('HEADING_ORDER_COMMENTS', 'Special Instructions or Order Comments');
 // no comments entered
 define('NO_COMMENTS_TEXT', 'None');

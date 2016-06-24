@@ -62,6 +62,25 @@
 <br class="clearBoth" />
 
 <?php
+// Additional Customers fields.
+if ($customersFields->countFields() > 0) {
+    if ($customersFields->isActive('dealercode')) {
+    ?>    
+        <label class="inputLabel" for="dealercode"><?php echo "Dealer code"; ?></label>
+        <?php echo zen_draw_input_field('dealercode', $account->fields['dealercode'], 'id="dealercode"') . (($customersFields->isRequired('dealercode'))  ? '<span class="alert">' . ENTRY_DEALERCODE_TEXT . '</span>' : ''); ?>
+        <br class="clearBoth" />    
+    <?php    
+    }
+	if ($customersFields->isActive('wagsn')) {
+    ?>    
+        <label class="inputLabel" for="wagsn"><?php echo "Wag Serial Number"; ?></label>
+        <?php echo zen_draw_input_field('wagsn', $account->fields['wagsn'], 'id="wagsn"') . (($customersFields->isRequired('wagsn'))  ? '<span class="alert">' . ENTRY_WAGSN_TEST . '</span>' : ''); ?>
+        <br class="clearBoth" />    
+    <?php    
+    }
+}
+// End of additional customers fields
+
   if (CUSTOMERS_REFERRAL_STATUS == 2 and $customers_referral == '') {
 ?>
 <label class="inputLabel" for="customers-referral"><?php echo ENTRY_CUSTOMERS_REFERRAL; ?></label>

@@ -16,6 +16,9 @@ define('TABLE_HEADING_BILLING_ADDRESS', 'Billing Address');
 define('TEXT_SELECTED_BILLING_DESTINATION', 'Your billing address is shown to the left. The billing address should match the address on your credit card statement. You can change the billing address by clicking the <em>Change Address</em> button.');
 define('TITLE_BILLING_ADDRESS', 'Billing Address:');
 
+define('COD_TAX_WARNING', '* Estimate duties and taxes required for shipping. Other local taxes may be due upon delivery.');
+
+
 define('TABLE_HEADING_PAYMENT_METHOD', 'Payment Method');
 define('TEXT_SELECT_PAYMENT_METHOD', 'Please select a payment method for this order.');
 define('TITLE_PLEASE_SELECT', 'Please Select');

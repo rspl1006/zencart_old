@@ -20,6 +20,6 @@
 // $Id: cod.php 1969 2005-09-13 06:57:21Z drbyte $
 //
 
-  define('MODULE_PAYMENT_COD_TEXT_TITLE', 'Cash on Delivery');
+  define('MODULE_PAYMENT_COD_TEXT_TITLE', 'Manual Payment (Check, Money Order, Wire Transfer, Purchase Order, etc.)');
   define('MODULE_PAYMENT_COD_TEXT_DESCRIPTION', 'Cash on Delivery');
 ?>

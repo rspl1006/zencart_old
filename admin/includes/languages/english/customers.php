@@ -56,4 +56,6 @@ define('ADDRESS_BOOK_TITLE', 'Address Book Entries');
 define('PRIMARY_ADDRESS', '(primary address)');
 define('TEXT_MAXIMUM_ENTRIES', '<span class="coming"><strong>NOTE:</strong></span> A maximum of %s address book entries allowed.');
 define('TEXT_INFO_ADDRESS_BOOK_COUNT', ' | 1 of  ');
+
+define('ENTRY_CUSTOMERS_UPDATE_SUCCESSFUL', '<font color=\"green\">Success !</font>');
 ?>

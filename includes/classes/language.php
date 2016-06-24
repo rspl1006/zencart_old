@@ -68,7 +68,7 @@ class language extends base {
 
     $this->catalog_languages = array();
     $languages_query = "select languages_id, name, code, image, directory
-                          from " . TABLE_LANGUAGES . " 
+                          from " . TABLE_LANGUAGES . " where enabled = 1 " . " 
                           order by sort_order";
 
     $languages = $db->Execute($languages_query);

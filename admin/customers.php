@@ -12,6 +12,12 @@
   require(DIR_WS_CLASSES . 'currencies.php');
   $currencies = new currencies();
 
+  // Additional Customers Fields.
+  require(DIR_WS_CLASSES . 'addcustomersfields.php');
+  $customersFields = new addCustomersFields();
+  $customersFields->getFields();
+  // End of additional customers fields.  
+
   $action = (isset($_GET['action']) ? $_GET['action'] : '');
   $customers_id = zen_db_prepare_input($_GET['cID']);
 
@@ -121,6 +127,16 @@
         $entry_state = zen_db_prepare_input($_POST['entry_state']);
         if (isset($_POST['entry_zone_id'])) $entry_zone_id = zen_db_prepare_input($_POST['entry_zone_id']);
 
+ // Additional Customers Fields.        
+        if ($customersFields->validatePostContent()) {        
+            if (sizeof($customersFields->updatePostContent()) > 0) {            
+                $sql_update = "UPDATE " . TABLE_CUSTOMERS . " SET " . zen_db_output($customersFields->updatePostContent()) . " WHERE customers_id = '" . (int)$customers_id . "'";
+                $db->Execute($sql_update);            
+            }
+        } else {
+            $error = true;
+        }
+        // End of Additional Customers Fields.
         if (strlen($customers_firstname) < ENTRY_FIRST_NAME_MIN_LENGTH) {
           $error = true;
           $entry_firstname_error = true;
@@ -135,6 +151,7 @@
           $entry_lastname_error = false;
         }
 
+
         if (ACCOUNT_DOB == 'true') {
           if (ENTRY_DOB_MIN_LENGTH >0) {
             if (checkdate(substr(zen_date_raw($customers_dob), 4, 2), substr(zen_date_raw($customers_dob), 6, 2), substr(zen_date_raw($customers_dob), 0, 4))) {
@@ -143,9 +160,9 @@
               $error = true;
               $entry_date_of_birth_error = true;
             }
-          } else {
-            $customers_dob = '0001-01-01 00:00:00';
           }
+        } else {
+          $customers_dob = '0001-01-01 00:00:00';
         }
 
         if (strlen($customers_email_address) < ENTRY_EMAIL_ADDRESS_MIN_LENGTH) {
@@ -288,7 +305,12 @@
 
         zen_db_perform(TABLE_ADDRESS_BOOK, $sql_data_array, 'update', "customers_id = '" . (int)$customers_id . "' and address_book_id = '" . (int)$default_address_id . "'");
 
+ // Additional customers fields - bonus (optional - see your includes/languages/<your_language>/customers.php file for this additional entry definition).
+        if (defined('ENTRY_CUSTOMERS_UPDATE_SUCCESSFUL')) {
+            $messageStack->add_session(ENTRY_CUSTOMERS_UPDATE_SUCCESSFUL, 'success');
+        }
         zen_redirect(zen_href_link(FILENAME_CUSTOMERS, zen_get_all_get_params(array('cID', 'action')) . 'cID=' . $customers_id, 'NONSSL'));
+        // End of additional customers fields.;
 
         } else if ($error == true) {
           $cInfo = new objectInfo($_POST);
@@ -344,6 +366,8 @@
         zen_redirect(zen_href_link(FILENAME_CUSTOMERS, zen_get_all_get_params(array('cID', 'action')), 'NONSSL'));
         break;
       default:
+      
+      // Additional Customers Fields.      
         $customers = $db->Execute("select c.customers_id, c.customers_gender, c.customers_firstname,
                                           c.customers_lastname, c.customers_dob, c.customers_email_address,
                                           a.entry_company, a.entry_street_address, a.entry_suburb,
@@ -351,13 +375,17 @@
                                           a.entry_country_id, c.customers_telephone, c.customers_fax,
                                           c.customers_newsletter, c.customers_default_address_id,
                                           c.customers_email_format, c.customers_group_pricing,
-                                          c.customers_authorization, c.customers_referral
-                                  from " . TABLE_CUSTOMERS . " c left join " . TABLE_ADDRESS_BOOK . " a
+                                          c.customers_authorization, c.customers_referral" . $customersFields->showFields("c.") . "
+
+                                  from " . TABLE_CUSTOMERS . " c 
+								  left join " . TABLE_ADDRESS_BOOK . " a
                                   on c.customers_default_address_id = a.address_book_id
                                   where a.customers_id = c.customers_id
                                   and c.customers_id = '" . (int)$customers_id . "'");
 
         $cInfo = new objectInfo($customers->fields);
+      // End of additional customers fields.
+        
     }
   }
 ?>
@@ -876,8 +904,12 @@ if ($processed == true) {
   } else {
     $group_array_query = $db->execute("select group_id, group_name, group_percentage from " . TABLE_GROUP_PRICING);
     $group_array[] = array('id'=>0, 'text'=>TEXT_NONE);
-    while (!$group_array_query->EOF) {
-      $group_array[] = array('id'=>$group_array_query->fields['group_id'], 'text'=>$group_array_query->fields['group_name'].'&nbsp;'.$group_array_query->fields['group_percentage'].'%');
+   while (!$group_array_query->EOF) {
+      if(in_array($group_array_query->fields['group_name'], array(GROUP_PRICE_PER_ITEM1, GROUP_PRICE_PER_ITEM2, GROUP_PRICE_PER_ITEM3, GROUP_PRICE_PER_ITEM4,GROUP_PRICE_PER_ITEM5, GROUP_PRICE_PER_ITEM6, GROUP_PRICE_PER_ITEM7, GROUP_PRICE_PER_ITEM8,GROUP_PRICE_PER_ITEM9, GROUP_PRICE_PER_ITEM10,GROUP_PRICE_PER_ITEM11, GROUP_PRICE_PER_ITEM12, GROUP_PRICE_PER_ITEM13, GROUP_PRICE_PER_ITEM14,GROUP_PRICE_PER_ITEM15, GROUP_PRICE_PER_ITEM16, GROUP_PRICE_PER_ITEM17, GROUP_PRICE_PER_ITEM18,GROUP_PRICE_PER_ITEM19, GROUP_PRICE_PER_ITEM20))) {
+        $group_array[] = array('id' => $group_array_query->fields['group_id'], 'text' => $group_array_query->fields['group_name'] . '&nbsp;' . GROUP_PRICE_PER_ITEM_TEXT);
+      } else {
+        $group_array[] = array('id' => $group_array_query->fields['group_id'], 'text' => $group_array_query->fields['group_name'].'&nbsp;'.$group_array_query->fields['group_percentage'].'%');
+      }
       $group_array_query->MoveNext();
     }
     echo zen_draw_pull_down_menu('customers_group_pricing', $group_array, $cInfo->customers_group_pricing);
@@ -894,6 +926,15 @@ if ($processed == true) {
         </table></td>
       </tr>
 
+ <?php
+      // Additional Customers Fields.            
+      if (!function_exists('edit_add_customers_fields_from_core_customers_page()')) {
+          if (@file_exists(DIR_WS_INCLUDES . DIR_WS_FUNCTIONS . '/extra_functions/additional_customers_fields_functions.php')) {              
+              @include_once(DIR_WS_INCLUDES . DIR_WS_FUNCTIONS . '/extra_functions/additional_customers_fields_functions.php');
+          } // End of if statement.
+          echo edit_add_customers_fields_from_core_customers_page();                        
+      } // End of Additional Customers Fields.
+      ?>
       <tr>
         <td><?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?></td>
       </tr>
